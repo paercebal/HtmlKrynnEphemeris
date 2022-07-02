@@ -23,6 +23,11 @@ function setValueById(p_id, p_value)
     byId(p_id).value = p_value;
 }
 
+function modulo(n, m)
+{
+  return ((n % m) + m) % m;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
@@ -33,7 +38,7 @@ function convert_epoch_day_to_calendar_day(p_epoch_day)
    const year = Math.floor(p_epoch_day / 336);
    const year_day = p_epoch_day - (year * 336);
    
-   const non_negative_year_day = year_day % 336;
+   const non_negative_year_day = modulo(year_day, 336);
    
    const month = Math.floor(non_negative_year_day / 28);
    const day = non_negative_year_day - (month * 28);
@@ -180,7 +185,7 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
 {
     function week_day_name(p_day)
     {
-        const day = p_day % 7;
+        const day = modulo(p_day, 7);
         switch(day)
         {
             case 0: return "Sunday";
@@ -233,8 +238,18 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
     
     function year_name(p_year)
     {
-        if(p_year >= 0) return p_year + " AC";
-        return p_year + " PC";
+        const str_ac_prefix = p_year + ((p_year >= 0) ? " AC" : " PC");
+        
+        // Istar Calendar
+        const str_ia_suffix = " [" + (p_year + 963) + " IA]";
+
+        // Ergothian Calendar
+        const str_ec_suffix = " [" + (p_year + 2601) + " EC]";
+       
+        // Kender Calendar
+        const str_ktol_suffix = " [" + (p_year + 3000) + " KToL]";
+       
+        return str_ac_prefix + str_ia_suffix + str_ec_suffix + str_ktol_suffix;
     }
     
     let str_calendar_date = week_day_name(p_day);

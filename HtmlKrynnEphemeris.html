@@ -3,13 +3,13 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
-<title>Krynn Ephemeris v0.6</title>
+<title>Krynn Ephemeris v0.7</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
 </head>
 <body onload="do_onload()">
 
-<h1>Krynn Ephemeris (v0.6)</h1>
+<h1>Krynn Ephemeris (v0.7)</h1>
 
 <!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
 
@@ -24,17 +24,17 @@
 <br />
 
 Epoch Day: <input id="ID_epochDay" type="number" step="1" size="8" value="0" onchange="on_change_epoch_day()" onkeyup="on_change_epoch_day()" />
-Year: <input id="ID_calendaryYear" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
-Month: <input id="ID_calendaryMonth" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
-Day: <input id="ID_calendaryDay" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
-Date: <input id="ID_calendaryDate" type="text" size="30" value="" />
+Year: <input id="ID_calendaryYear" type="number" step="1" size="5" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+Month: <input id="ID_calendaryMonth" type="number" step="1" size="4" value="0" min="0" max="11" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+Day: <input id="ID_calendaryDay" type="number" step="1" size="4" value="0" min="0" max="27" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+Date: <input id="ID_calendaryDate" type="text" size="60" value="" />
 
 <br />
 
-Sun Phase Day: <input id="ID_phaseDay_Sun" type="number" step="1" size="4" value="0" />
-Solinari Phase Day: <input id="ID_phaseDay_Solinari" type="number" step="1" size="3" value="0" />
-Lunitari Phase Day: <input id="ID_phaseDay_Lunitari" type="number" step="1" size="3" value="0" />
-Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="number" step="1" size="3" value="0" />
+Sun Phase Day: <input id="ID_phaseDay_Sun" type="number" step="1" size="4" value="0" min="0" max="335" />
+Solinari Phase Day: <input id="ID_phaseDay_Solinari" type="number" step="1" size="3" value="0" min="0" max="35" />
+Lunitari Phase Day: <input id="ID_phaseDay_Lunitari" type="number" step="1" size="3" value="0" min="0" max="27" />
+Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="number" step="1" size="3" value="0" min="0" max="7" />
 
 </div>
 
@@ -59,6 +59,8 @@ function increment_day(p_value)
    const epochDay = getIntegerById("ID_epochDay") + p_value;
    setValueById("ID_epochDay", epochDay);
    update_by_epoch_day();
+   update_phases_by_epoch_day();
+   redraw_all();
 }
 
 function on_change_epoch_day()
@@ -78,10 +80,10 @@ function on_change_calendar_date()
 function update_phases_by_epoch_day()
 {
    const epochDay = getIntegerById("ID_epochDay");
-   const sunPhase = epochDay % 336;
-   const solinariPhase = epochDay % 36;
-   const lunitariPhase = epochDay % 28;
-   const nuitariPhase = epochDay % 8;
+   const sunPhase = modulo(epochDay, 336);
+   const solinariPhase = modulo(epochDay, 36);
+   const lunitariPhase = modulo(epochDay, 28);
+   const nuitariPhase = modulo(epochDay, 8);
    setValueById("ID_phaseDay_Sun", sunPhase);
    setValueById("ID_phaseDay_Solinari", solinariPhase);
    setValueById("ID_phaseDay_Lunitari", lunitariPhase);
@@ -156,6 +158,9 @@ function display_date_from_fields()
 
 function do_onload()
 {
+   // 120178
+   setValueById("ID_epochDay", 120178);
+   on_change_epoch_day();
    redraw_all();
 }
 </script>
