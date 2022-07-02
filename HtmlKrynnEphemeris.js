@@ -26,13 +26,36 @@ function setValueById(p_id, p_value)
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+function convert_epoch_day_to_calendar_day(p_epoch_day)
+{
+   // note: year, month and day all start at zero
 
+   const year = Math.floor(p_epoch_day / 336);
+   const year_day = p_epoch_day - (year * 336);
+   
+   const non_negative_year_day = year_day % 336;
+   
+   const month = Math.floor(non_negative_year_day / 28);
+   const day = non_negative_year_day - (month * 28);
+   
+   //alert("p_epoch_day:" + p_epoch_day + "\nyear:" + year + "\nyear_day:" + year_day + "\nnon_negative_year_day:" + non_negative_year_day + "\nmonth:" + month + "\nday" + day);
+   
+   return { year : year, month : month, day, day};
+}
 
+function convert_calendar_day_to_epoch_day(p_year, p_month, p_day)
+{
+   // note: year, month and day all start at zero
 
+   let days = p_year * 336;
+   days += p_month * 28;
+   days += p_day;
 
+   //alert("p_year:" + p_year + "\np_month:" + p_month + "\np_day:" + p_day + "\ndays:" + days);
 
-
-
+   
+   return days;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -47,7 +70,7 @@ function rotate_moon_phase(p_moon_phase, p_rotation)
    return p_moon_phase;
 }
 
-function deduce_canvas_moon_coordinates(p_is_taladas, p_is_nuitari, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size)
+function deduce_canvas_moon_coordinates(p_is_taladas, p_is_sun, p_is_nuitari, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size)
 {
    const canvas_x_size = byId("ID_canvas").width;
    const canvas_y_size = byId("ID_canvas").height;
@@ -61,6 +84,10 @@ function deduce_canvas_moon_coordinates(p_is_taladas, p_is_nuitari, p_moon_phase
    if(p_is_nuitari && (!p_is_taladas))
    {
       moon_phase = rotate_moon_phase(moon_phase, 0.1875);
+   }
+   else if (p_is_sun)
+   {
+      moon_phase = rotate_moon_phase(moon_phase, -0.25);
    }
    else
    {
@@ -90,36 +117,36 @@ function deduce_canvas_moon_coordinates(p_is_taladas, p_is_nuitari, p_moon_phase
    return { x : moon_pos_x, y : moon_pos_y};
 }
 
-function draw_one_moon(p_is_taladas, p_is_nuitari, p_name, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size)
+function draw_one_moon(p_is_taladas, p_is_sun, p_is_nuitari, p_name, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size)
 {
    const ctx = get_map_context();
 
    // background map
    const moon_img = document.getElementById("ID_image" + p_name);
    
-   const moon_pos = deduce_canvas_moon_coordinates(p_is_taladas, p_is_nuitari, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size);
+   const moon_pos = deduce_canvas_moon_coordinates(p_is_taladas, p_is_sun, p_is_nuitari, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size);
    
    ctx.drawImage(moon_img, moon_pos.x, moon_pos.y);
 }
 
 function draw_sun(p_is_taladas, p_sun_phase)
 {
-   draw_one_moon(p_is_taladas, false, "Sun", p_sun_phase, 336, 365, 48);
+   draw_one_moon(p_is_taladas, true, false, "Sun", p_sun_phase, 336, 365, 48);
 }
 
 function draw_moon_solinari(p_is_taladas, p_moon_phase)
 {
-   draw_one_moon(p_is_taladas, false, "Solinari", p_moon_phase, 36, 317, 48);
+   draw_one_moon(p_is_taladas, false, false, "Solinari", p_moon_phase, 36, 317, 48);
 }
 
 function draw_moon_lunitari(p_is_taladas, p_moon_phase)
 {
-   draw_one_moon(p_is_taladas, false, "Lunitari", p_moon_phase, 28, 268, 48);
+   draw_one_moon(p_is_taladas, false, false, "Lunitari", p_moon_phase, 28, 268, 48);
 }
 
 function draw_moon_nuitari(p_is_taladas, p_moon_phase)
 {
-   draw_one_moon(p_is_taladas, true, "Nuitari", p_moon_phase, 8, 220, 48);
+   draw_one_moon(p_is_taladas, false, true, "Nuitari", p_moon_phase, 8, 220, 48);
 }
 
 function get_map_context()
@@ -146,5 +173,75 @@ function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase,
    draw_moon_solinari(p_is_taladas, p_solinari_phase);
    draw_moon_lunitari(p_is_taladas, p_lunitari_phase);
    draw_moon_nuitari(p_is_taladas, p_nuitari_phase);
+}
+
+
+function get_calendar_date_as_string(p_year, p_month, p_day)
+{
+    function week_day_name(p_day)
+    {
+        const day = p_day % 7;
+        switch(day)
+        {
+            case 0: return "Sunday";
+            case 1: return "Monday";
+            case 2: return "Tuesday";
+            case 3: return "Wednesday";
+            case 4: return "Thursday";
+            case 5: return "Friday";
+            case 6: return "Saturday";
+        }
+        
+        throw "Oops";
+    }
+    
+    function day_name(p_day)
+    {
+        ++p_day;
+        switch(p_day)
+        {
+            case 1: return "1st";
+            case 2: return "2nd";
+            case 3: return "3rd";
+            default: return p_day + "th";
+        }
+        
+        throw "Oops";
+    }
+    
+    function month_name(p_month)
+    {
+        ++p_month;
+        switch(p_month)
+        {
+            case 1: return "January";
+            case 2: return "February";
+            case 3: return "March";
+            case 4: return "April";
+            case 5: return "May";
+            case 6: return "June";
+            case 7: return "July";
+            case 8: return "August";
+            case 9: return "September";
+            case 10: return "October";
+            case 11: return "November";
+            case 12: return "December";
+        }
+        
+        throw "Oops";
+    }
+    
+    function year_name(p_year)
+    {
+        if(p_year >= 0) return p_year + " AC";
+        return p_year + " PC";
+    }
+    
+    let str_calendar_date = week_day_name(p_day);
+    str_calendar_date += " " + day_name(p_day);
+    str_calendar_date += " " + month_name(p_month);
+    str_calendar_date += " " + year_name(p_year);
+    
+    return str_calendar_date;
 }
 
