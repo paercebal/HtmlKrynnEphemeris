@@ -1,0 +1,190 @@
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<title>Krynn Ephemeris v0.5</title>
+<script src="./HtmlKrynnEphemeris.js"></script>
+<style>@import url("HtmlKrynnEphemeris.css");</style>
+</head>
+<body onload="do_onload()">
+
+<h1>Krynn Ephemeris (v0.5)</h1>
+
+<!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
+
+<div id="ID_map"><canvas id="ID_canvas" width="800" height="800"></canvas></div>
+
+<div>
+
+<button id="ID_setTaladasOrClassic" type="button" onclick="setTaladasOrClassic()">Set Taladas</button>
+<button id="ID_previousDay" type="button" onclick="previous_day()">&lt;</button>
+<button id="ID_nextDay" type="button" onclick="next_day()">&gt;</button>
+
+<br />
+
+Epoch Day: <input id="ID_epochDay" type="number" step="1" size="8" value="0" onchange="on_change_epoch_day()" onkeyup="on_change_epoch_day()" />
+Year: <input id="ID_calendaryYear" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+Month: <input id="ID_calendaryMonth" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+Day: <input id="ID_calendaryDay" type="number" step="1" size="4" value="0" onchange="on_change_calendar_date()" onkeyup="on_change_calendar_date()" />
+
+<br />
+
+Sun Phase Day: <input id="ID_phaseDay_Sun" type="number" step="1" size="4" value="0" />
+Solinari Phase Day: <input id="ID_phaseDay_Solinari" type="number" step="1" size="3" value="0" />
+Lunitari Phase Day: <input id="ID_phaseDay_Lunitari" type="number" step="1" size="3" value="0" />
+Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="number" step="1" size="3" value="0" />
+
+</div>
+
+<div id="ID_result">...</div>
+
+<script>
+
+let g_is_taladas = false;
+
+function previous_day()
+{
+   increment_day(-1);
+}
+
+function next_day()
+{
+   increment_day(1);
+}
+
+function increment_day(p_value)
+{
+   const epochDay = getIntegerById("ID_epochDay") + p_value;
+   setValueById("ID_epochDay", epochDay);
+   update_by_epoch_day();
+}
+
+function on_change_epoch_day()
+{
+   update_by_epoch_day();
+   update_phases_by_epoch_day();
+   draw_map_from_fields();
+}
+
+function on_change_calendar_date()
+{
+   update_by_calendar_date();
+   update_phases_by_epoch_day();
+   draw_map_from_fields();
+}
+
+function update_phases_by_epoch_day()
+{
+   const epochDay = getIntegerById("ID_epochDay");
+   const sunPhase = epochDay % 336;
+   const solinariPhase = epochDay % 36;
+   const lunitariPhase = epochDay % 28;
+   const nuitariPhase = epochDay % 8;
+   setValueById("ID_phaseDay_Sun", sunPhase);
+   setValueById("ID_phaseDay_Solinari", solinariPhase);
+   setValueById("ID_phaseDay_Lunitari", lunitariPhase);
+   setValueById("ID_phaseDay_Nuitari", nuitariPhase);
+}
+
+function update_by_epoch_day()
+{
+   const epochDay = getIntegerById("ID_epochDay");
+   const calendarDay = convert_epoch_day_to_calendar_day(epochDay);
+   setValueById("ID_calendaryYear", calendarDay.year);
+   setValueById("ID_calendaryMonth", calendarDay.month);
+   setValueById("ID_calendaryDay", calendarDay.day);
+}
+
+function update_by_calendar_date()
+{
+   const calendarYear = getIntegerById("ID_calendaryYear");
+   const calendarMonth = getIntegerById("ID_calendaryMonth");
+   const calendarDay = getIntegerById("ID_calendaryDay");
+   const epochDay = convert_calendar_day_to_epoch_day(calendarYear, calendarMonth, calendarDay);
+   setValueById("ID_epochDay", epochDay);
+}
+
+function setTaladasOrClassic()
+{
+   g_is_taladas = !g_is_taladas;
+   
+   if(g_is_taladas)
+   {
+      byId("ID_setTaladasOrClassic").textContent = "Set Classic";
+   }
+   else
+   {
+      byId("ID_setTaladasOrClassic").textContent = "Set Taladas";
+   }
+   
+   draw_map_from_fields();
+}
+
+function draw_map_from_fields()
+{
+   const sun_phase_day = getIntegerById("ID_phaseDay_Sun");
+   const solinari_phase_day = getIntegerById("ID_phaseDay_Solinari");
+   const lunitari_phase_day = getIntegerById("ID_phaseDay_Lunitari");
+   const nuitari_phase_day = getIntegerById("ID_phaseDay_Nuitari");
+   
+   draw_map(g_is_taladas, sun_phase_day, solinari_phase_day, lunitari_phase_day, nuitari_phase_day);
+}
+
+function convert_epoch_day_to_calendar_day(p_epoch_day)
+{
+   // note: year, month and day all start at zero
+
+   const year = Math.floor(p_epoch_day / 336);
+   const year_day = p_epoch_day - (year * 336);
+   
+   const non_negative_year_day = year_day % 336;
+   
+   const month = Math.floor(non_negative_year_day / 28);
+   const day = non_negative_year_day - (month * 28);
+   
+   //alert("p_epoch_day:" + p_epoch_day + "\nyear:" + year + "\nyear_day:" + year_day + "\nnon_negative_year_day:" + non_negative_year_day + "\nmonth:" + month + "\nday" + day);
+   
+   return { year : year, month : month, day, day};
+}
+
+function convert_calendar_day_to_epoch_day(p_year, p_month, p_day)
+{
+   // note: year, month and day all start at zero
+
+   let days = p_year * 336;
+   days += p_month * 28;
+   days += p_day;
+
+   //alert("p_year:" + p_year + "\np_month:" + p_month + "\np_day:" + p_day + "\ndays:" + days);
+
+   
+   return days;
+}
+
+
+function do_onload()
+{
+   draw_map_from_fields();
+}
+</script>
+
+<style>
+div#ID_map
+{
+   background-color : #000a1c;
+   text-align : center;
+}
+</style>
+
+<div style="display : none;">
+<img id="ID_imageMapClassic" src="./moon_phases.classic.png" /><br />
+<img id="ID_imageMapTaladas" src="./moon_phases.taladas.png" /><br />
+<img id="ID_imageSolinari" src="./moon.solinari.png" /><br />
+<img id="ID_imageLunitari" src="./moon.lunitari.png" /><br />
+<img id="ID_imageNuitari" src="./moon.nuitari.png" /><br />
+<img id="ID_imageSun" src="./sun.png" /><br />
+</div>
+
+</body>
+</html>
