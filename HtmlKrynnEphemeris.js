@@ -92,7 +92,7 @@ function deduce_canvas_moon_coordinates(p_is_taladas, p_is_sun, p_is_nuitari, p_
    }
    else if (p_is_sun)
    {
-      moon_phase = rotate_moon_phase(moon_phase, -0.25);
+      moon_phase = rotate_moon_phase(moon_phase, (10 / 336) -0.25);
    }
    else
    {
@@ -238,7 +238,8 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
     
     function year_name(p_year)
     {
-        const str_ac_prefix = p_year + ((p_year >= 0) ? " AC" : " PC");
+        const ac_pc_year = (p_year >= 0) ? (p_year + 1) : (p_year);
+        const str_ac_prefix = ((p_year >= 0) ? ((p_year + 1) + " AC") : (p_year + " PC"));
         
         // Istar Calendar
         const str_ia_suffix = " [" + (p_year + 963) + " IA]";
