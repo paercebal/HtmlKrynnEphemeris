@@ -64,3 +64,4 @@ table.cssTable td.cssCenter { text-align : center ; }
 table.cssTable td.cssRight { text-align : right ; }
 table.cssTable td.cssJustify { text-align : justify ; }
 
+span.cssButtonGroup { padding : 0 3em; }
