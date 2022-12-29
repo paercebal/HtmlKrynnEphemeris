@@ -65,15 +65,78 @@ function convert_calendar_day_to_epoch_day(p_year, p_month, p_day)
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
-function rotate_moon_phase(p_moon_phase, p_rotation)
+function rotate_body_phase(p_body_phase, p_initial_rotation_0_to_1)
 {
-   p_moon_phase += p_rotation;
+   p_body_phase += p_initial_rotation_0_to_1;
    
-   while(p_moon_phase >= 1) p_moon_phase -= 1;
-   while(p_moon_phase < 0) p_moon_phase += 1;
+   while(p_body_phase >= 1) p_body_phase -= 1;
+   while(p_body_phase < 0) p_body_phase += 1;
    
-   return p_moon_phase;
+   return p_body_phase;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+function deduce_canvas_sky_chart_coordinates(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size)
+{
+   const canvas_x_size = byId("ID_canvas").width;
+   const canvas_y_size = byId("ID_canvas").height;
+   const canvas_radius = canvas_x_size / 2;
+   const canvas_center_x = canvas_radius;
+   const canvas_center_y = canvas_radius;
+   const sky_chart_image_half_size = p_sky_chart_image_size / 2;
+
+   let sky_chart_phase = p_sun_phase / p_sun_phase_max;
+   let sky_chart_phase_radian = sky_chart_phase * 2 * Math.PI;
+   
+   var str_alert = "";
+   str_alert += "canvas_x_size: " + canvas_x_size + "\n";
+   str_alert += "canvas_y_size: " + canvas_y_size + "\n";
+   str_alert += "canvas_radius: " + canvas_radius + "\n";
+   str_alert += "canvas_center_x: " + canvas_center_x + "\n";
+   str_alert += "canvas_center_y: " + canvas_center_y + "\n";
+   str_alert += "sky_chart_image_half_size: " + sky_chart_image_half_size + "\n";
+   str_alert += "sky_chart_phase: " + sky_chart_phase + "\n";
+   str_alert += "sky_chart_phase_radian: " + sky_chart_phase_radian + "\n";
+   //str_alert += "moon_center_y: " + moon_center_y + "\n";
+   //str_alert += "moon_pos_x: " + moon_pos_x + "\n";
+   //str_alert += "moon_pos_y: " + moon_pos_y + "\n";
+   //alert(str_alert);
+
+   return { rotation_radian : sky_chart_phase_radian };
+}
+
+function draw_sky_chart(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size)
+{
+   const canvas_x_size = byId("ID_canvas").width;
+   const canvas_y_size = byId("ID_canvas").height;
+   const ctx = get_map_context();
+
+   // sky chart map
+   const sky_chart_img = document.getElementById("ID_imageSkyChart");
+
+   const sky_chart_pos = deduce_canvas_sky_chart_coordinates(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size);
+   
+   const vertical_offset = 80;
+   
+   // Rotated rectangle
+   ctx.translate(canvas_x_size/2, canvas_y_size/2);
+   ctx.translate(0, -vertical_offset);
+   //ctx.rotate(90 * Math.PI / 180);
+   ctx.rotate(sky_chart_pos.rotation_radian);
+   ctx.translate(0, +vertical_offset);
+   ctx.translate(-canvas_x_size/2, -canvas_y_size/2);
+
+
+   ctx.drawImage(sky_chart_img, 0, -vertical_offset);
+
+   // Reset transformation matrix to the identity matrix
+   ctx.setTransform(1, 0, 0, 1, 0, 0);   
+}
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 function deduce_canvas_moon_coordinates(p_is_taladas, p_is_sun, p_is_nuitari, p_moon_phase, p_moon_phase_max, p_radius, p_moon_image_size)
 {
@@ -88,15 +151,15 @@ function deduce_canvas_moon_coordinates(p_is_taladas, p_is_sun, p_is_nuitari, p_
    
    if(p_is_nuitari && (!p_is_taladas))
    {
-      moon_phase = rotate_moon_phase(moon_phase, 0.1875);
+      moon_phase = rotate_body_phase(moon_phase, 0.1875);
    }
    else if (p_is_sun)
    {
-      moon_phase = rotate_moon_phase(moon_phase, (10 / 336) -0.25);
+      moon_phase = rotate_body_phase(moon_phase, (10 / 336) -0.25);
    }
    else
    {
-      moon_phase = rotate_moon_phase(moon_phase, 0.25);
+      moon_phase = rotate_body_phase(moon_phase, 0.25);
    }
 
    const moon_center_x = p_radius * Math.cos(moon_phase * 2 * Math.PI);
@@ -136,7 +199,7 @@ function draw_one_moon(p_is_taladas, p_is_sun, p_is_nuitari, p_name, p_moon_phas
 
 function draw_sun(p_is_taladas, p_sun_phase)
 {
-   draw_one_moon(p_is_taladas, true, false, "Sun", p_sun_phase, 336, 365, 48);
+   draw_one_moon(p_is_taladas, true, false, "Sun", p_sun_phase, 336, 367, 48);
 }
 
 function draw_moon_solinari(p_is_taladas, p_moon_phase)
@@ -163,16 +226,39 @@ function get_map_context()
 
 function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase, p_nuitari_phase)
 {
+   const background_color = "#000a1c";
+   
    const ctx = get_map_context();
    
    // color background
-   ctx.fillStyle = "#000a1c";
+   ctx.fillStyle = background_color;
    ctx.fillRect(0, 0, 800, 800);
    
+   // sky chart map
+   draw_sky_chart(p_sun_phase, 336, 800);
+   //const sky_chart_img = document.getElementById("ID_imageSkyChart");
+   //ctx.drawImage(sky_chart_img, 0, -70);
+
+   // color background
+   ctx.fillStyle = background_color;
+   ctx.fillRect(0, 0, 800, 200);
+   ctx.fillRect(0, 600, 800, 200);
+   ctx.fillRect(0, 0, 200, 800);
+   ctx.fillRect(600, 0, 200, 800);
+
+
+   // compass map
+   const compass_img = document.getElementById("ID_imageCompass");
+   ctx.drawImage(compass_img, 0, 0);
+
    // background map
    const map_src = (p_is_taladas) ? "ID_imageMapTaladas" : "ID_imageMapClassic";
    const map_img = document.getElementById(map_src);
    ctx.drawImage(map_img, 0, 0);
+
+   // moon phases map
+   const moon_phases_img = document.getElementById("ID_imageMoonPhases");
+   ctx.drawImage(moon_phases_img, 0, 0);
 
    draw_sun(p_is_taladas, p_sun_phase);
    draw_moon_solinari(p_is_taladas, p_solinari_phase);
