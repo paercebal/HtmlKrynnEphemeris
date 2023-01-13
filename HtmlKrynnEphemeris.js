@@ -248,6 +248,10 @@ function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase,
 
 
    // compass map
+   const horizon_img = document.getElementById("ID_imageHorizon");
+   ctx.drawImage(horizon_img, 0, 0);
+
+   // compass map
    const compass_img = document.getElementById("ID_imageCompass");
    ctx.drawImage(compass_img, 0, 0);
 
