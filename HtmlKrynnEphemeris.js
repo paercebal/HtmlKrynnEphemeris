@@ -31,6 +31,80 @@ function modulo(n, m)
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
+function HephemerisData()
+{
+   //this.c_sunPhaseAtDayZero = 0;
+   this.c_solinariPhaseAtDayZero = 13;
+   this.c_lunitariPhaseAtDayZero = 21;
+   this.c_nuitariPhaseAtDayZero = 1;
+
+   this.c_sunPhasePeriod = 336;
+   this.c_solinariPhasePeriod = 36;
+   this.c_lunitariPhasePeriod = 28;
+   this.c_nuitariPhasePeriod = 8;
+
+   this.c_weekLength = 7;
+   this.c_monthLength = 28;
+   this.c_yearLength = 336;
+   
+   this.m_is_debug_visible = false;
+   this.m_is_taladas = true;
+   
+   // 119842 : Tuesday 3rd September 357 AC [1319 IA] [2957 EC] [3356 KToL]
+   this.m_epochDay = 119842;
+   this.m_latitude = -45;
+}
+
+HephemerisData.prototype.getSunPhase = function()
+{
+   return modulo(this.m_epochDay, this.c_sunPhasePeriod);
+}
+
+HephemerisData.prototype.getSolinariPhase = function()
+{
+   return modulo(this.m_epochDay + this.c_solinariPhaseAtDayZero, this.c_solinariPhasePeriod);
+}
+
+HephemerisData.prototype.getLunitariPhase = function()
+{
+   return modulo(this.m_epochDay + this.c_lunitariPhaseAtDayZero, this.c_lunitariPhasePeriod);
+}
+
+HephemerisData.prototype.getNuitariPhase = function()
+{
+   return modulo(this.m_epochDay + this.c_nuitariPhaseAtDayZero, this.c_nuitariPhasePeriod);
+}
+
+HephemerisData.prototype.toString = function()
+{
+   let a = [];
+
+   //a.push("- ", "c_sunPhaseAtDayZero", ": ", this.c_sunPhaseAtDayZero,"\n");
+   a.push("- ", "c_solinariPhaseAtDayZero", ": ", this.c_solinariPhaseAtDayZero,"\n");
+   a.push("- ", "c_lunitariPhaseAtDayZero", ": ", this.c_lunitariPhaseAtDayZero,"\n");
+   a.push("- ", "c_nuitariPhaseAtDayZero", ": ", this.c_nuitariPhaseAtDayZero,"\n");
+   a.push("- ", "c_sunPhasePeriod", ": ", this.c_sunPhasePeriod,"\n");
+   a.push("- ", "c_solinariPhasePeriod", ": ", this.c_solinariPhasePeriod,"\n");
+   a.push("- ", "c_lunitariPhasePeriod", ": ", this.c_lunitariPhasePeriod,"\n");
+   a.push("- ", "c_nuitariPhasePeriod", ": ", this.c_nuitariPhasePeriod,"\n");
+   a.push("- ", "c_weekLength", ": ", this.c_weekLength,"\n");
+   a.push("- ", "c_monthLength", ": ", this.c_monthLength,"\n");
+   a.push("- ", "c_yearLength", ": ", this.c_yearLength,"\n");
+   a.push("- ", "m_is_debug_visible", ": ", this.m_is_debug_visible,"\n");
+   a.push("- ", "m_is_taladas", ": ", this.m_is_taladas,"\n");
+   a.push("- ", "m_epochDay", ": ", this.m_epochDay,"\n");
+   a.push("- ", "m_latitude", ": ", this.m_latitude,"\n");
+   a.push("- ", "getSunPhase()", ": ", this.getSunPhase(),"\n");
+   a.push("- ", "getSolinariPhase()", ": ", this.getSolinariPhase(),"\n");
+   a.push("- ", "getLunitariPhase()", ": ", this.getLunitariPhase(),"\n");
+   a.push("- ", "getNuitariPhase()", ": ", this.getNuitariPhase(),"\n");
+
+   return a.join("");
+}
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 function convert_epoch_day_to_calendar_day(p_epoch_day)
 {
    // note: year, month and day all start at zero
@@ -58,9 +132,15 @@ function convert_calendar_day_to_epoch_day(p_year, p_month, p_day)
 
    //alert("p_year:" + p_year + "\np_month:" + p_month + "\np_day:" + p_day + "\ndays:" + days);
 
-   
    return days;
 }
+
+function convert_dumb_day_to_calendar_day(p_day)       { return p_day - 1; }
+function convert_calendar_day_to_dumb_day(p_day)       { return p_day + 1; }
+function convert_dumb_month_to_calendar_month(p_month) { return p_month - 1; }
+function convert_calendar_month_to_dumb_month(p_month) { return p_month + 1; }
+function convert_dumb_year_to_calendar_year(p_year)    { return (p_year >= 1) ? p_year - 1 : p_year; }
+function convert_calendar_year_to_dumb_year(p_year)    { return (p_year >= 0) ? p_year + 1 : p_year; }
 
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -107,7 +187,7 @@ function deduce_canvas_sky_chart_coordinates(p_sun_phase, p_sun_phase_max, p_sky
    return { rotation_radian : sky_chart_phase_radian };
 }
 
-function draw_sky_chart(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size)
+function draw_sky_chart(p_data, p_sun_phase, p_sun_phase_max, p_sky_chart_image_size, p_position_latitude)
 {
    const canvas_x_size = byId("ID_canvas").width;
    const canvas_y_size = byId("ID_canvas").height;
@@ -116,9 +196,9 @@ function draw_sky_chart(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size)
    // sky chart map
    const sky_chart_img = document.getElementById("ID_imageSkyChart");
 
-   const sky_chart_pos = deduce_canvas_sky_chart_coordinates(p_sun_phase, p_sun_phase_max, p_sky_chart_image_size);
+   const sky_chart_pos = deduce_canvas_sky_chart_coordinates(p_data.getSunPhase(), p_sun_phase_max, p_sky_chart_image_size);
    
-   const vertical_offset = 80;
+   const vertical_offset = (p_position_latitude + 90) / 90 * 200;
    
    // Rotated rectangle
    ctx.translate(canvas_x_size/2, canvas_y_size/2);
@@ -224,7 +304,7 @@ function get_map_context()
    return ctx;
 }
 
-function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase, p_nuitari_phase)
+function draw_map(p_data)
 {
    const background_color = "#000a1c";
    
@@ -235,9 +315,7 @@ function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase,
    ctx.fillRect(0, 0, 800, 800);
    
    // sky chart map
-   draw_sky_chart(p_sun_phase, 336, 800);
-   //const sky_chart_img = document.getElementById("ID_imageSkyChart");
-   //ctx.drawImage(sky_chart_img, 0, -70);
+   draw_sky_chart(p_data, p_data.getSunPhase(), p_data.c_sunPhasePeriod, 800, p_data.m_latitude);
 
    // color background
    ctx.fillStyle = background_color;
@@ -256,7 +334,7 @@ function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase,
    ctx.drawImage(compass_img, 0, 0);
 
    // background map
-   const map_src = (p_is_taladas) ? "ID_imageMapTaladas" : "ID_imageMapClassic";
+   const map_src = (p_data.m_is_taladas) ? "ID_imageMapTaladas" : "ID_imageMapClassic";
    const map_img = document.getElementById(map_src);
    ctx.drawImage(map_img, 0, 0);
 
@@ -264,10 +342,10 @@ function draw_map(p_is_taladas, p_sun_phase, p_solinari_phase, p_lunitari_phase,
    const moon_phases_img = document.getElementById("ID_imageMoonPhases");
    ctx.drawImage(moon_phases_img, 0, 0);
 
-   draw_sun(p_is_taladas, p_sun_phase);
-   draw_moon_solinari(p_is_taladas, p_solinari_phase);
-   draw_moon_lunitari(p_is_taladas, p_lunitari_phase);
-   draw_moon_nuitari(p_is_taladas, p_nuitari_phase);
+   draw_sun(p_data.m_is_taladas, p_data.getSunPhase());
+   draw_moon_solinari(p_data.m_is_taladas, p_data.getSolinariPhase());
+   draw_moon_lunitari(p_data.m_is_taladas, p_data.getLunitariPhase());
+   draw_moon_nuitari(p_data.m_is_taladas, p_data.getNuitariPhase());
 }
 
 
@@ -328,8 +406,8 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
     
     function year_name(p_year)
     {
-        const ac_pc_year = (p_year >= 0) ? (p_year + 1) : (p_year);
-        const str_ac_prefix = ((p_year >= 0) ? ((p_year + 1) + " AC") : (p_year + " PC"));
+        const ac_pc_year = convert_calendar_year_to_dumb_year(p_year);
+        const str_ac_prefix = (p_year >= 0) ? " AC" : " PC";
         
         // Istar Calendar
         const str_ia_suffix = " [" + (p_year + 963) + " IA]";
@@ -340,7 +418,7 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
         // Kender Calendar
         const str_ktol_suffix = " [" + (p_year + 3000) + " KToL]";
        
-        return str_ac_prefix + str_ia_suffix + str_ec_suffix + str_ktol_suffix;
+        return ac_pc_year + str_ac_prefix + str_ia_suffix + str_ec_suffix + str_ktol_suffix;
     }
     
     let str_calendar_date = week_day_name(p_day);
