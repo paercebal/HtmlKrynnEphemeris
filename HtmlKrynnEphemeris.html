@@ -4,53 +4,85 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
-<title>Krynn Ephemeris v0.9.9</title>
+<title>Krynn Ephemeris v0.9.92</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
 </head>
 <body onload="do_onload()">
 
-<h1>Krynn Ephemeris (v0.9.9)</h1>
-
+<!--
+<h1>Krynn Ephemeris (v0.9.92)</h1>
+-->
 <!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
 
 <div id="ID_map"><canvas id="ID_canvas" width="800" height="800"></canvas></div>
 
+<div id="ID_allControlsGroup">
+
+<div id="ID_userControls" class="cssDisplayBlock">
 <div>
 <center>
+
+<span class="cssButtonGroup">
+<!--<button id="ID_previousDay" type="button" onclick="previous_day()" title="Press LEFT button for previous day">&lt;</button>-->
+Day:<input id="ID_dumbDay" type="number" step="1" size="4" value="0" min="1" max="28" onchange="on_change_dumb_date(true)" onkeyup="on_change_dumb_date(true)" />
+<!--<button id="ID_nextDay" type="button" onclick="next_day()" title="Press RIGHT button for next day">&gt;</button>-->
+<!--
+</span>
+<span class="cssButtonGroup">
+-->
+<!--<button id="ID_previousMonth" type="button" onclick="previous_month()" title="Press CTRL+LEFT button for previous month">&lt;</button>-->
+Month:<input id="ID_dumbMonth" type="number" step="1" size="4" value="0" min="1" max="12" onchange="on_change_dumb_date(true)" onkeyup="on_change_dumb_date(true)" />
+<!--<button id="ID_nextMonth" type="button" onclick="next_month()" title="Press CTRL+RIGHT button for next month">&gt;</button>-->
+<!--
+</span>
+<span class="cssButtonGroup">
+-->
+<!--<button id="ID_previousYear" type="button" onclick="previous_year()" title="Press SHIFT+LEFT button for previous year">&lt;</button>-->
+Year:<input id="ID_dumbYear" type="number" step="1" size="6" value="0" onchange="on_change_dumb_date(true)" onkeyup="on_change_dumb_date(true)" />
+<!--<button id="ID_nextYear" type="button" onclick="next_year()" title="Press SHIFT+RIGHT button for next year">&gt;</button>-->
+</span>
+<span class="cssButtonGroup">
+Epoch Day:<input id="ID_epochDay" type="number" step="1" size="8" value="0" onchange="on_change_epoch_day_gui_event()" onkeyup="on_change_epoch_day_gui_event()" />
+</span>
+<span class="cssButtonGroup">
+Latitude:<input id="ID_latitude" type="number" step="1" size="4" value="-45" onchange="on_change_latitude_gui_event()" onkeyup="on_change_latitude_gui_event()" />°
+</span>
+
+<span class="cssButtonGroup">
 <button id="ID_setTaladasOrClassic" type="button" onclick="set_taladas_or_classic()">Set Taladas</button>
-<span class="cssButtonGroup">
-<button id="ID_previousDay" type="button" onclick="previous_day()" title="Press LEFT button for previous day">&lt;</button>
-Day
-<button id="ID_nextDay" type="button" onclick="next_day()" title="Press RIGHT button for next day">&gt;</button>
+<button id="ID_enableDebugOrNot" type="button" onclick="enable_debug_or_not()">Enable Debug</button>
 </span>
-<span class="cssButtonGroup">
-<button id="ID_previousMonth" type="button" onclick="previous_month()" title="Press CTRL+LEFT button for previous month">&lt;</button>
-Month
-<button id="ID_nextMonth" type="button" onclick="next_month()" title="Press CTRL+RIGHT button for next month">&gt;</button>
-</span>
-<span class="cssButtonGroup">
-<button id="ID_previousYear" type="button" onclick="previous_year()" title="Press SHIFT+LEFT button for previous year">&lt;</button>
-Year
-<button id="ID_nextYear" type="button" onclick="next_year()" title="Press SHIFT+RIGHT button for next year">&gt;</button>
-</span>
+
 <!--
 <button id="ID_nextNightOfEye" type="button" onclick="increment_day_until(undefined, 0, 0, 0)">Next Night of the Eye</button>
 -->
 </center>
+</div>
 
-Epoch Day: <input id="ID_epochDay" type="number" step="1" size="8" value="0" onchange="on_change_epoch_day(true)" onkeyup="on_change_epoch_day(true)" />
-Year: <input id="ID_calendaryYear" type="number" step="1" size="5" value="0" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
-Month: <input id="ID_calendaryMonth" type="number" step="1" size="4" value="0" min="0" max="11" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
-Day: <input id="ID_calendaryDay" type="number" step="1" size="4" value="0" min="0" max="27" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
+<div>
+
 Date: <input id="ID_calendaryDate" type="text" size="60" value="" readonly="readonly" />
+
+</div>
+
+</div>
+
+<div id="ID_debugControls" class="cssDisplayNone">
+
+
+Z-Year: <input id="ID_calendaryYear" type="number" step="1" size="6" value="0" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
+Z-Month: <input id="ID_calendaryMonth" type="number" step="1" size="4" value="0" min="0" max="11" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
+Z-Day: <input id="ID_calendaryDay" type="number" step="1" size="4" value="0" min="0" max="27" onchange="on_change_calendar_date(true)" onkeyup="on_change_calendar_date(true)" />
 
 <br />
 
-Sun Phase Day: <input id="ID_phaseDay_Sun" type="number" step="1" size="4" value="0" min="0" max="335" />
-Solinari Phase Day: <input id="ID_phaseDay_Solinari" type="number" step="1" size="3" value="0" min="0" max="35" />
-Lunitari Phase Day: <input id="ID_phaseDay_Lunitari" type="number" step="1" size="3" value="0" min="0" max="27" />
-Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="number" step="1" size="3" value="0" min="0" max="7" />
+Sun Phase Day: <input id="ID_phaseDay_Sun" type="text" size="3" value="0" readonly="readonly" />
+Solinari Phase Day: <input id="ID_phaseDay_Solinari" type="text" size="2" value="0" readonly="readonly" />
+Lunitari Phase Day: <input id="ID_phaseDay_Lunitari" type="text" size="2" value="0" readonly="readonly" />
+Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="text" size="2" value="0" readonly="readonly" />
+
+</div>
 
 </div>
 
@@ -58,7 +90,40 @@ Nuitari Phase Day: <input id="ID_phaseDay_Nuitari" type="number" step="1" size="
 
 <script>
 
-let g_is_taladas = true;
+let g_global_data = new HephemerisData();
+
+function is_debug_visible()
+{
+   return g_global_data.m_is_debug_visible;
+}
+
+function set_debug_visibility(p_is_debug_visible)
+{
+   g_global_data.m_is_debug_visible = p_is_debug_visible;
+}
+
+function update_debug_visibility()
+{
+   if(g_global_data.m_is_debug_visible)
+   {
+      byId("ID_debugControls").setAttribute("class", "cssDisplayBlock");
+      byId("ID_enableDebugOrNot").innerHTML = "Disable Debug";
+   }
+   else
+   {
+      byId("ID_debugControls").setAttribute("class", "cssDisplayNone");
+      byId("ID_enableDebugOrNot").innerHTML = "Enable Debug";
+   }
+}
+
+function enable_debug_or_not()
+{
+   set_debug_visibility(!g_global_data.m_is_debug_visible)
+   update_debug_visibility();
+}
+
+
+
 
 function previous_day()
 {
@@ -72,22 +137,22 @@ function next_day()
 
 function previous_month()
 {
-   increment_day(-28);
+   increment_day(-g_global_data.c_monthLength);
 }
 
 function next_month()
 {
-   increment_day(28);
+   increment_day(g_global_data.c_monthLength);
 }
 
 function previous_year()
 {
-   increment_day(-336);
+   increment_day(-g_global_data.c_yearLength);
 }
 
 function next_year()
 {
-   increment_day(336);
+   increment_day(g_global_data.c_yearLength);
 }
 
 function increment_day_until(p_sun, p_solinari, p_lunitari, p_nuitari)
@@ -102,10 +167,10 @@ function increment_day_until(p_sun, p_solinari, p_lunitari, p_nuitari)
    {
       increment_day_without_redraw(1);
    
-      let sun_is_right = is_right(p_sun, "ID_phaseDay_Sun");
-      let solinari_is_right = is_right(p_solinari, "ID_phaseDay_Solinari");
-      let lunitari_is_right = is_right(p_lunitari, "ID_phaseDay_Lunitari");
-      let nuitari_is_right = is_right(p_nuitari, "ID_phaseDay_Nuitari");
+      let sun_is_right = is_right(p_sun, g_global_data.getSunPhase());
+      let solinari_is_right = is_right(p_solinari, g_global_data.getSolinariPhase());
+      let lunitari_is_right = is_right(p_lunitari, g_global_data.getLunitariPhase());
+      let nuitari_is_right = is_right(p_nuitari, g_global_data.getNuitariPhase());
       
       if(sun_is_right && solinari_is_right && lunitari_is_right && nuitari_is_right)
       {
@@ -116,6 +181,20 @@ function increment_day_until(p_sun, p_solinari, p_lunitari, p_nuitari)
    }
 }
 
+function increase_latitude()
+{
+   g_global_data.m_latitude += 1;
+   setValueById("ID_latitude", g_global_data.m_latitude);
+   on_change_latitude(true);
+}
+
+function decrease_latitude()
+{
+   g_global_data.m_latitude -= 1;
+   setValueById("ID_latitude", g_global_data.m_latitude);
+   on_change_latitude(true);
+}
+
 function increment_day(p_value)
 {
    increment_day_without_redraw(p_value);
@@ -124,10 +203,16 @@ function increment_day(p_value)
 
 function increment_day_without_redraw(p_value)
 {
-   const epochDay = getIntegerById("ID_epochDay") + p_value;
-   setValueById("ID_epochDay", epochDay);
+   g_global_data.m_epochDay += p_value;
+   setValueById("ID_epochDay", g_global_data.m_epochDay);
    update_by_epoch_day();
    update_phases_by_epoch_day();
+}
+
+function on_change_epoch_day_gui_event()
+{
+   g_global_data.m_epochDay = getIntegerById("ID_epochDay");
+   on_change_epoch_day(true);
 }
 
 function on_change_epoch_day(p_redraw_all)
@@ -141,6 +226,21 @@ function on_change_epoch_day(p_redraw_all)
    }
 }
 
+function on_change_latitude_gui_event()
+{
+   g_global_data.m_latitude = getIntegerById("ID_latitude");
+   on_change_latitude(true);
+}
+
+function on_change_latitude(p_redraw_all)
+{
+   if(p_redraw_all)
+   {
+      redraw_all();
+   }
+}
+
+
 function on_change_calendar_date(p_redraw_all)
 {
    update_by_calendar_date();
@@ -152,29 +252,31 @@ function on_change_calendar_date(p_redraw_all)
    }
 }
 
+function on_change_dumb_date(p_redraw_all)
+{
+   update_by_dumb_date();
+   update_phases_by_epoch_day();
+   
+   if(p_redraw_all)
+   {
+      redraw_all();
+   }
+}
+
 function update_phases_by_epoch_day()
 {
-   const epochDay = getIntegerById("ID_epochDay");
-   const sunPhase = modulo(epochDay, 336);
-   //const solinariPhase = modulo(epochDay + 13, 36);
-   //const lunitariPhase = modulo(epochDay + 15, 28);
-   //const nuitariPhase = modulo(epochDay + 1, 8);
-   const solinariPhase = modulo(epochDay + 13, 36);
-   const lunitariPhase = modulo(epochDay + 21, 28);
-   const nuitariPhase = modulo(epochDay + 1, 8);
-   //const solinariPhase = modulo(epochDay + 0, 36);
-   //const lunitariPhase = modulo(epochDay + 0, 28);
-   //const nuitariPhase = modulo(epochDay + 0, 8);
-   setValueById("ID_phaseDay_Sun", sunPhase);
-   setValueById("ID_phaseDay_Solinari", solinariPhase);
-   setValueById("ID_phaseDay_Lunitari", lunitariPhase);
-   setValueById("ID_phaseDay_Nuitari", nuitariPhase);
+   setValueById("ID_epochDay", g_global_data.m_epochDay);
+   setValueById("ID_phaseDay_Sun", g_global_data.getSunPhase());
+   setValueById("ID_phaseDay_Solinari", g_global_data.getSolinariPhase());
+   setValueById("ID_phaseDay_Lunitari", g_global_data.getLunitariPhase());
+   setValueById("ID_phaseDay_Nuitari", g_global_data.getNuitariPhase());
 }
 
 function update_by_epoch_day()
 {
-   const epochDay = getIntegerById("ID_epochDay");
+   const epochDay = g_global_data.m_epochDay;
    const calendarDay = convert_epoch_day_to_calendar_day(epochDay);
+   setValueById("ID_epochDay", epochDay);
    setValueById("ID_calendaryYear", calendarDay.year);
    setValueById("ID_calendaryMonth", calendarDay.month);
    setValueById("ID_calendaryDay", calendarDay.day);
@@ -185,20 +287,31 @@ function update_by_calendar_date()
    const calendarYear = getIntegerById("ID_calendaryYear");
    const calendarMonth = getIntegerById("ID_calendaryMonth");
    const calendarDay = getIntegerById("ID_calendaryDay");
-   const epochDay = convert_calendar_day_to_epoch_day(calendarYear, calendarMonth, calendarDay);
-   setValueById("ID_epochDay", epochDay);
+   g_global_data.m_epochDay = convert_calendar_day_to_epoch_day(calendarYear, calendarMonth, calendarDay);
+   setValueById("ID_epochDay", g_global_data.m_epochDay);
+}
+
+function update_by_dumb_date()
+{
+   const dumbYear = getIntegerById("ID_dumbYear");
+   const dumbMonth = getIntegerById("ID_dumbMonth");
+   const dumbDay = getIntegerById("ID_dumbDay");
+   setValueById("ID_calendaryYear", convert_dumb_year_to_calendar_year(dumbYear));
+   setValueById("ID_calendaryMonth", convert_dumb_month_to_calendar_month(dumbMonth));
+   setValueById("ID_calendaryDay", convert_dumb_day_to_calendar_day(dumbDay));
+   update_by_calendar_date();
 }
 
 function set_taladas_or_classic(p_is_taladas)
 {
    if(p_is_taladas === undefined)
    {
-      g_is_taladas = !g_is_taladas;
+      g_global_data.m_is_taladas = !g_global_data.m_is_taladas;
       redraw_all();
    }
-   else if(g_is_taladas != p_is_taladas)
+   else if(g_global_data.m_is_taladas != p_is_taladas)
    {
-      g_is_taladas = p_is_taladas;
+      g_global_data.m_is_taladas = p_is_taladas;
       redraw_all();
    }
 }
@@ -206,14 +319,15 @@ function set_taladas_or_classic(p_is_taladas)
 function redraw_all()
 {
    update_taladas_or_classic_button_label();
-   draw_map_from_fields();
+   draw_map(g_global_data);
    display_date_from_fields();
+   update_debug_visibility();
    set_location_search_info();
 }
 
 function update_taladas_or_classic_button_label()
 {
-   if(g_is_taladas)
+   if(g_global_data.m_is_taladas)
    {
       byId("ID_setTaladasOrClassic").textContent = "Set Classic";
    }
@@ -223,26 +337,23 @@ function update_taladas_or_classic_button_label()
    }
 }
 
-function draw_map_from_fields()
-{
-   const sun_phase_day = getIntegerById("ID_phaseDay_Sun");
-   const solinari_phase_day = getIntegerById("ID_phaseDay_Solinari");
-   const lunitari_phase_day = getIntegerById("ID_phaseDay_Lunitari");
-   const nuitari_phase_day = getIntegerById("ID_phaseDay_Nuitari");
-   
-   draw_map(g_is_taladas, sun_phase_day, solinari_phase_day, lunitari_phase_day, nuitari_phase_day);
-}
-
 function display_date_from_fields()
 {
    const calendarYear = getIntegerById("ID_calendaryYear");
    const calendarMonth = getIntegerById("ID_calendaryMonth");
    const calendarDay = getIntegerById("ID_calendaryDay");
+   const dumbYear = convert_calendar_year_to_dumb_year(calendarYear);
+   const dumbMonth = convert_calendar_month_to_dumb_month(calendarMonth);
+   const dumbDay = convert_calendar_day_to_dumb_day(calendarDay);
+   setValueById("ID_dumbYear", dumbYear);
+   setValueById("ID_dumbMonth", dumbMonth);
+   setValueById("ID_dumbDay", dumbDay);
    let str_line = get_calendar_date_as_string(calendarYear, calendarMonth, calendarDay);
    setValueById("ID_calendaryDate", str_line);
 }
 
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 function get_location_search_info(p_redraw_all)
 {
@@ -260,46 +371,93 @@ function get_location_search_info(p_redraw_all)
          set_taladas_or_classic(false);
       }
    }
+
+   let debug_visible = params.get('debug');
+   if(debug_visible != null)
+   {
+      if(debug_visible == 'true')
+      {
+         set_debug_visibility(true);
+         update_debug_visibility();
+      }
+      else
+      {
+         set_debug_visibility(false);
+         update_debug_visibility();
+      }
+   }
+   
+   let latitude = parseInt(params.get('latitude'), 10);
+   if((! isNaN(latitude)) && (latitude != g_global_data.m_latitude))
+   {
+      g_global_data.m_latitude = latitude;
+      setValueById("ID_latitude", g_global_data.m_latitude);
+      on_change_latitude(p_redraw_all);
+   }
    
    let epoch = parseInt(params.get('epoch'), 10);
-   if((! isNaN(epoch)) && (epoch != getIntegerById("ID_epochDay")))
+   if((! isNaN(epoch)) && (epoch != g_global_data.m_epochDay))
    {
-      setValueById("ID_epochDay", epoch);
+      g_global_data.m_epochDay = epoch;
+      setValueById("ID_epochDay", g_global_data.m_epochDay);
       on_change_epoch_day(p_redraw_all);
-      return;
+      //return;
    }
 }
+
+let g_last_location_search_info = null;
 
 function set_location_search_info()
 {
    let s = window.location.pathname;
-   s += '?epoch=' + getIntegerById("ID_epochDay");
-   s += '&taladas_or_classic=' + (g_is_taladas ? 'taladas' : 'classic');
+   s += '?epoch=' + g_global_data.m_epochDay;
+   s += '&taladas_or_classic=' + (g_global_data.m_is_taladas ? 'taladas' : 'classic');
    
+   if(g_global_data.m_latitude != -45)
+   {
+      s += '&latitude=' + g_global_data.m_latitude;
+   }
+   
+   if(is_debug_visible())
+   {
+      s += '&debug=true';
+   }
+  
 /*
    if(document.location.search != s)
    {
       document.location.search = s;
    }
 */
-   window.history.replaceState("object or string", "Title", s);
+   //window.history.replaceState("object or string", "Title", s);
+   if(s != g_last_location_search_info)
+   {
+      g_last_location_search_info = s;
+   }
 }
 
+function update_browser_location_search_info()
+{
+   if(g_last_location_search_info != null)
+   {
+      window.history.replaceState("object or string", "Title", g_last_location_search_info);
+   }
+}
 
-
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 function do_onload()
 {
-   // 119842 : Tuesday 3rd September 357 AC [1319 IA] [2957 EC] [3356 KToL]
-   setValueById("ID_epochDay", 119842);
    on_change_epoch_day(false);
+   on_change_latitude(false);
    get_location_search_info(false);
    redraw_all();
+   setInterval(update_browser_location_search_info, 500);
 }
 
-
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 document.addEventListener('keydown',
    (event) => {
@@ -317,6 +475,16 @@ document.addEventListener('keydown',
          if(event.shiftKey) previous_year();
          else if(event.ctrlKey) previous_month();
          else previous_day();
+         return;
+      }
+      else if(keyName === 'ArrowUp')
+      {
+         increase_latitude();
+         return;
+      }
+      else if(keyName === 'ArrowDown')
+      {
+         decrease_latitude();
          return;
       }
 
@@ -343,7 +511,8 @@ document.addEventListener('keydown',
    }
 , false);
 
-
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 
 </script>
 
@@ -353,6 +522,17 @@ div#ID_map
    background-color : #000a1c;
    text-align : center;
 }
+
+div#ID_allControlsGroup
+{
+   padding : 0.5em;
+}
+
+div#ID_debugControls
+{
+   padding : 0.5em 0 0 0;
+}
+
 </style>
 
 <div style="display : none;">

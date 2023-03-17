@@ -1,6 +1,9 @@
 body
 {
    background : #EEEEEE;
+   padding : 0;
+   border : 0;
+   margin : 0;
 }
 
 table, tr, th, td
@@ -59,9 +62,15 @@ table.cssTable td.cssBlack
 .cssRight { text-align : right ; }
 .cssJustify { text-align : justify ; }
 
+.cssDisplayBlock { display : block; }
+.cssDisplayNone { display : none; }
+
+
 table.cssTable td.cssLeft { text-align : left ; }
 table.cssTable td.cssCenter { text-align : center ; }
 table.cssTable td.cssRight { text-align : right ; }
 table.cssTable td.cssJustify { text-align : justify ; }
 
-span.cssButtonGroup { padding : 0 3em; }
+span.cssButtonGroup { padding : 0 1.5em; }
+
+
