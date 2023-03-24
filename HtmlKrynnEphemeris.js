@@ -390,24 +390,13 @@ function draw_map(p_data)
    draw_moon_nuitari(p_data.m_is_taladas, p_data.getNuitariPhase());
 }
 
-
-function get_calendar_date_as_string(p_year, p_month, p_day)
+function get_calendar_date_as_string_by_origin(p_origin, p_year, p_month, p_day)
 {
-    function week_day_name(p_day)
+    function week_day_name(p_origin, p_day)
     {
         const day = modulo(p_day, 7);
-        switch(day)
-        {
-            case 0: return "Sunday";
-            case 1: return "Monday";
-            case 2: return "Tuesday";
-            case 3: return "Wednesday";
-            case 4: return "Thursday";
-            case 5: return "Friday";
-            case 6: return "Saturday";
-        }
-        
-        throw "Oops";
+        const origin_weekday = g_weekdays_map[p_origin][day];
+        return origin_weekday;
     }
     
     function day_name(p_day)
@@ -424,26 +413,10 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
         throw "Oops";
     }
     
-    function month_name(p_month)
+    function month_name(p_origin, p_month)
     {
-        ++p_month;
-        switch(p_month)
-        {
-            case 1: return "January";
-            case 2: return "February";
-            case 3: return "March";
-            case 4: return "April";
-            case 5: return "May";
-            case 6: return "June";
-            case 7: return "July";
-            case 8: return "August";
-            case 9: return "September";
-            case 10: return "October";
-            case 11: return "November";
-            case 12: return "December";
-        }
-        
-        throw "Oops";
+        const origin_month = g_months_map[p_origin][p_month];
+        return origin_month;
     }
     
     function year_name(p_year)
@@ -463,9 +436,9 @@ function get_calendar_date_as_string(p_year, p_month, p_day)
         return ac_pc_year + str_ac_prefix + str_ia_suffix + str_ec_suffix + str_ktol_suffix;
     }
     
-    let str_calendar_date = week_day_name(p_day);
+    let str_calendar_date = week_day_name(p_origin, p_day);
     str_calendar_date += " " + day_name(p_day);
-    str_calendar_date += " " + month_name(p_month);
+    str_calendar_date += " " + month_name(p_origin, p_month);
     str_calendar_date += " " + year_name(p_year);
     
     return str_calendar_date;
