@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
 <title>Krynn Ephemeris v0.9.95</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
+<script src="./HtmlKrynnEphemeris.calendars.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
 </head>
 <body onload="do_onload()">
@@ -62,7 +63,21 @@ Latitude:<input id="ID_latitude" type="number" step="1" size="4" value="-45" onc
 
 <div>
 
-Date: <input id="ID_calendaryDate" type="text" size="60" value="" readonly="readonly" />
+Date:
+
+<select id="ID_calendarOrigin" onchange="on_change_calendar_origin_event()">
+   <option value="Default">Default</option>
+   <option value="Ergoth">Ergoth</option>
+   <option value="Plainsmen">Plainsmen</option>
+   <option value="Solamnic">Solamnic</option>
+   <option value="Dwarven">Dwarven</option>
+   <option value="Elven">Elven</option>
+   <option value="Kender">Kender</option>
+   <option value="Goblin">Goblin</option>
+   <option value="God-days">God-days</option>
+</select>
+
+<input id="ID_calendaryDateOrigin" type="text" size="60" value="" readonly="readonly" />
 
 </div>
 
@@ -98,8 +113,6 @@ Nuitari: <input id="ID_phaseDayAtDayZero_Nuitari" type="number" size="2" value="
 
 </div>
 
-<div id="ID_result">...</div>
-
 <script>
 
 let g_global_data = new HephemerisData();
@@ -132,6 +145,7 @@ function enable_debug_or_not()
 {
    set_debug_visibility(!g_global_data.m_is_debug_visible)
    update_debug_visibility();
+   set_location_search_info();
 }
 
 
@@ -225,6 +239,53 @@ function on_change_epoch_day_gui_event()
 {
    g_global_data.m_epochDay = getIntegerById("ID_epochDay");
    on_change_epoch_day(true);
+}
+
+function get_calendar_origin()
+{
+   return byId("ID_calendarOrigin").value;
+}
+
+function set_calendar_origin(p_origin)
+{
+   const select = byId("ID_calendarOrigin");
+   const options = select.options;
+   let index = -1;
+   
+   for(let i = 0, iMax = options.length; i < iMax; ++i)
+   {
+      let o = options[i];
+      if(o.value == p_origin)
+      {
+         index = i;
+         break;
+      }
+   }
+   
+   if(index != -1)
+   {
+      select.selectedIndex = index;
+   }
+}
+
+function on_change_calendar_origin_event()
+{
+   update_calendar_origin(true);
+}
+
+function update_calendar_origin(p_redraw_all)
+{
+   const epochDay = g_global_data.m_epochDay;
+   const calendarDay = convert_epoch_day_to_calendar_day(epochDay);
+   const origin = byId("ID_calendarOrigin").value;
+   //alert("origin:" + origin + "\ng_weekdays_map:" + g_weekdays_map);
+   const text = get_calendar_date_as_string_by_origin(origin, calendarDay.year, calendarDay.month, calendarDay.day);
+   setValueById("ID_calendaryDateOrigin", text);
+   
+   if(p_redraw_all)
+   {
+      redraw_all();
+   }
 }
 
 function on_change_epoch_day(p_redraw_all)
@@ -378,6 +439,7 @@ function redraw_all()
    draw_map(g_global_data);
    display_date_from_fields();
    update_debug_visibility();
+   update_calendar_origin();
    set_location_search_info();
 }
 
@@ -404,8 +466,7 @@ function display_date_from_fields()
    setValueById("ID_dumbYear", dumbYear);
    setValueById("ID_dumbMonth", dumbMonth);
    setValueById("ID_dumbDay", dumbDay);
-   let str_line = get_calendar_date_as_string(calendarYear, calendarMonth, calendarDay);
-   setValueById("ID_calendaryDate", str_line);
+   update_calendar_origin();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -441,6 +502,13 @@ function get_location_search_info(p_redraw_all)
          set_debug_visibility(false);
          update_debug_visibility();
       }
+   }
+
+   let calendar = params.get('calendar');
+   if(calendar != null)
+   {
+      set_calendar_origin(calendar);
+      update_calendar_origin(p_redraw_all);
    }
 
    let latitude = parseInt(params.get('latitude'), 10);
@@ -520,6 +588,12 @@ function set_location_search_info()
    if(g_global_data.m_latitude != -45)
    {
       s += '&latitude=' + g_global_data.m_latitude;
+   }
+
+   let calendar = get_calendar_origin();
+   if(calendar != "Default")
+   {
+      s += '&calendar=' + calendar;
    }
 
    if(g_global_data.m_skychart_starfield_intensity != 2)
