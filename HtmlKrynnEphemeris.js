@@ -38,6 +38,10 @@ function HephemerisData()
    this.c_lunitariPhaseAtDayZero = 21;
    this.c_nuitariPhaseAtDayZero = 1;
 
+   this.m_solinariPhaseAtDayZero = this.c_solinariPhaseAtDayZero;
+   this.m_lunitariPhaseAtDayZero = this.c_lunitariPhaseAtDayZero;
+   this.m_nuitariPhaseAtDayZero = this.c_nuitariPhaseAtDayZero;
+
    this.c_sunPhasePeriod = 336;
    this.c_solinariPhasePeriod = 36;
    this.c_lunitariPhasePeriod = 28;
@@ -53,6 +57,25 @@ function HephemerisData()
    // 119842 : Tuesday 3rd September 357 AC [1319 IA] [2957 EC] [3356 KToL]
    this.m_epochDay = 119842;
    this.m_latitude = -45;
+   
+   this.m_skychart_starfield_intensity = 2;
+   this.m_skychart_grid_intensity = 3;
+   this.m_moon_phases_decoration_intensity = 0;
+}
+
+HephemerisData.prototype.getMoonPhasesDecorationIntensity = function()
+{
+   return this.m_moon_phases_decoration_intensity;
+}
+
+HephemerisData.prototype.getSkyChartStarfieldIntensity = function()
+{
+   return this.m_skychart_starfield_intensity;
+}
+
+HephemerisData.prototype.getSkyChartGridIntensity = function()
+{
+   return this.m_skychart_grid_intensity;
 }
 
 HephemerisData.prototype.getSunPhase = function()
@@ -62,17 +85,17 @@ HephemerisData.prototype.getSunPhase = function()
 
 HephemerisData.prototype.getSolinariPhase = function()
 {
-   return modulo(this.m_epochDay + this.c_solinariPhaseAtDayZero, this.c_solinariPhasePeriod);
+   return modulo(this.m_epochDay + this.m_solinariPhaseAtDayZero, this.c_solinariPhasePeriod);
 }
 
 HephemerisData.prototype.getLunitariPhase = function()
 {
-   return modulo(this.m_epochDay + this.c_lunitariPhaseAtDayZero, this.c_lunitariPhasePeriod);
+   return modulo(this.m_epochDay + this.m_lunitariPhaseAtDayZero, this.c_lunitariPhasePeriod);
 }
 
 HephemerisData.prototype.getNuitariPhase = function()
 {
-   return modulo(this.m_epochDay + this.c_nuitariPhaseAtDayZero, this.c_nuitariPhasePeriod);
+   return modulo(this.m_epochDay + this.m_nuitariPhaseAtDayZero, this.c_nuitariPhasePeriod);
 }
 
 HephemerisData.prototype.toString = function()
@@ -80,9 +103,9 @@ HephemerisData.prototype.toString = function()
    let a = [];
 
    //a.push("- ", "c_sunPhaseAtDayZero", ": ", this.c_sunPhaseAtDayZero,"\n");
-   a.push("- ", "c_solinariPhaseAtDayZero", ": ", this.c_solinariPhaseAtDayZero,"\n");
-   a.push("- ", "c_lunitariPhaseAtDayZero", ": ", this.c_lunitariPhaseAtDayZero,"\n");
-   a.push("- ", "c_nuitariPhaseAtDayZero", ": ", this.c_nuitariPhaseAtDayZero,"\n");
+   a.push("- ", "m_solinariPhaseAtDayZero", ": ", this.m_solinariPhaseAtDayZero,"\n");
+   a.push("- ", "m_lunitariPhaseAtDayZero", ": ", this.m_lunitariPhaseAtDayZero,"\n");
+   a.push("- ", "m_nuitariPhaseAtDayZero", ": ", this.m_nuitariPhaseAtDayZero,"\n");
    a.push("- ", "c_sunPhasePeriod", ": ", this.c_sunPhasePeriod,"\n");
    a.push("- ", "c_solinariPhasePeriod", ": ", this.c_solinariPhasePeriod,"\n");
    a.push("- ", "c_lunitariPhasePeriod", ": ", this.c_lunitariPhasePeriod,"\n");
@@ -195,6 +218,8 @@ function draw_sky_chart(p_data, p_sun_phase, p_sun_phase_max, p_sky_chart_image_
 
    // sky chart map
    const sky_chart_img = document.getElementById("ID_imageSkyChart");
+   const sky_chart_grid_img = document.getElementById("ID_imageSkyChartGrid");
+   const sky_chart_starfield_img = document.getElementById("ID_imageSkyChartStarfield");
 
    const sky_chart_pos = deduce_canvas_sky_chart_coordinates(p_data.getSunPhase(), p_sun_phase_max, p_sky_chart_image_size);
    
@@ -208,7 +233,19 @@ function draw_sky_chart(p_data, p_sun_phase, p_sun_phase_max, p_sky_chart_image_
    ctx.translate(0, +vertical_offset);
    ctx.translate(-canvas_x_size/2, -canvas_y_size/2);
 
+   const sky_chart_starfield_intensity = p_data.getSkyChartStarfieldIntensity();
+   const sky_chart_grid_intensity = p_data.getSkyChartGridIntensity();
 
+   for(let i = 0; i < sky_chart_starfield_intensity; ++i)
+   {
+      ctx.drawImage(sky_chart_starfield_img, 0, -vertical_offset);
+   }
+
+   for(let i = 0; i < sky_chart_grid_intensity; ++i)
+   {
+      ctx.drawImage(sky_chart_grid_img, 0, -vertical_offset);
+   }
+   
    ctx.drawImage(sky_chart_img, 0, -vertical_offset);
 
    // Reset transformation matrix to the identity matrix
@@ -339,8 +376,13 @@ function draw_map(p_data)
    ctx.drawImage(map_img, 0, 0);
 
    // moon phases map
-   const moon_phases_img = document.getElementById("ID_imageMoonPhases");
-   ctx.drawImage(moon_phases_img, 0, 0);
+   const moon_phases_decoration_img = document.getElementById("ID_imageMoonPhasesDecoration");
+   
+   const moon_phases_decoration_intensity = p_data.getMoonPhasesDecorationIntensity();
+   for(let i = 0; i < moon_phases_decoration_intensity; ++i)
+   {
+      ctx.drawImage(moon_phases_decoration_img, 0, 0);
+   }
 
    draw_sun(p_data.m_is_taladas, p_data.getSunPhase());
    draw_moon_solinari(p_data.m_is_taladas, p_data.getSolinariPhase());
