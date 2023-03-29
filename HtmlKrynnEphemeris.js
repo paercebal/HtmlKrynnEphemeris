@@ -34,9 +34,9 @@ function modulo(n, m)
 function HephemerisData()
 {
    //this.c_sunPhaseAtDayZero = 0;
-   this.c_solinariPhaseAtDayZero = 13;
-   this.c_lunitariPhaseAtDayZero = 21;
-   this.c_nuitariPhaseAtDayZero = 1;
+   this.c_solinariPhaseAtDayZero = 34; //13;
+   this.c_lunitariPhaseAtDayZero = 26; //21;
+   this.c_nuitariPhaseAtDayZero = 6; //1;
 
    this.m_solinariPhaseAtDayZero = this.c_solinariPhaseAtDayZero;
    this.m_lunitariPhaseAtDayZero = this.c_lunitariPhaseAtDayZero;
