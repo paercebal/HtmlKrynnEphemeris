@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
-<title>Krynn Ephemeris v0.9.95</title>
+<title>Krynn Ephemeris v0.9.96</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
 <script src="./HtmlKrynnEphemeris.calendars.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
@@ -16,7 +16,27 @@
 -->
 <!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
 
-<div id="ID_map"><canvas id="ID_canvas" width="800" height="800"></canvas></div>
+<div id="ID_mapContainer">
+<div id="ID_mapMouseSensible"><canvas id="ID_canvas" width="800" height="800"></canvas></div>
+
+
+<div>
+
+<select id="ID_calendarCombobox">
+</select>
+
+<style>
+</style>
+
+
+</div>
+
+</div>
+
+
+
+
+
 
 <div id="ID_allControlsGroup">
 
@@ -61,6 +81,7 @@ Latitude:<input id="ID_latitude" type="number" step="1" size="4" value="-45" onc
 </center>
 </div>
 
+
 <div>
 
 Date:
@@ -79,7 +100,9 @@ Date:
 
 <input id="ID_calendaryDateOrigin" type="text" size="60" value="" readonly="readonly" />
 
+
 </div>
+
 
 </div>
 
@@ -273,14 +296,57 @@ function on_change_calendar_origin_event()
    update_calendar_origin(true);
 }
 
+
+function update_calendarComboBox()
+{
+   const epochDay = g_global_data.m_epochDay;
+   const calendarDay = convert_epoch_day_to_calendar_day(epochDay);
+   const cb = byId("ID_calendarCombobox");
+
+   const get_right_option = function(p_value)
+   {
+      for(let i = 0, iMax = cb.options.length; i < iMax; ++i)
+      {
+         const o = cb.options[i];
+         
+         if(o.value == p_value)
+         {
+            return o;
+         }
+      }
+      
+      cb.options.length = cb.options.length + 1;
+      let o = cb.options[cb.options.length - 1];
+      o.value = p_value;
+      return o;
+   };
+   
+   for(let i = 0, iMax = g_calendar_id_list.length; i < iMax; ++i)
+   {
+      const origin = g_calendar_id_list[i];
+      const o = get_right_option(origin);
+      const text = get_calendar_date_as_string_by_origin(origin, calendarDay.year, calendarDay.month, calendarDay.day, false);
+      if(i == 0)
+      {
+         o.innerHTML = text;
+      }
+      else
+      {
+         o.innerHTML = text + " (" + o.value + ")";
+      }
+   }
+}
+
+
 function update_calendar_origin(p_redraw_all)
 {
    const epochDay = g_global_data.m_epochDay;
    const calendarDay = convert_epoch_day_to_calendar_day(epochDay);
    const origin = byId("ID_calendarOrigin").value;
    //alert("origin:" + origin + "\ng_weekdays_map:" + g_weekdays_map);
-   const text = get_calendar_date_as_string_by_origin(origin, calendarDay.year, calendarDay.month, calendarDay.day);
+   const text = get_calendar_date_as_string_by_origin(origin, calendarDay.year, calendarDay.month, calendarDay.day, true);
    setValueById("ID_calendaryDateOrigin", text);
+   update_calendarComboBox();
    
    if(p_redraw_all)
    {
@@ -668,7 +734,8 @@ function do_onload()
 //////////////////////////////////////////////////////////////////////////
 
 document.addEventListener('keydown',
-   (event) => {
+   (event) =>
+   {
       const keyName = event.key;
 
       if((keyName === 'ArrowRight') || (keyName === '+'))
@@ -719,18 +786,33 @@ document.addEventListener('keydown',
    }
 , false);
 
+
+document.getElementById("ID_mapMouseSensible").addEventListener('click',
+   (event) =>
+   {
+      let rect = document.getElementById("ID_mapMouseSensible").getBoundingClientRect();
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      if(x < (rect.width * 2 / 5))
+      {
+         increment_day(-1);
+      }
+      else if(x > (rect.width * 3 / 5))
+      {
+         increment_day(+1);
+      }
+   
+   }
+, false);
+
+
 //////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
 </script>
 
 <style>
-div#ID_map
-{
-   background-color : #000a1c;
-   text-align : center;
-}
-
 div#ID_allControlsGroup
 {
    padding : 0.5em;

@@ -1,3 +1,9 @@
+@font-face
+{
+   font-family : "DevinneSwash";
+   src         : url("./fonts/DevinneSwash-qZd5.ttf");
+}
+
 body
 {
    background : #EEEEEE;
@@ -74,3 +80,21 @@ table.cssTable td.cssJustify { text-align : justify ; }
 span.cssButtonGroup { padding : 0 1.5em; }
 
 
+div#ID_mapMouseSensible
+{
+   text-align : center;
+}
+
+div#ID_mapContainer
+{
+   background-color : #000a1c;
+   text-align : center;
+}
+
+select#ID_calendarCombobox
+{
+   font-size : 180%;
+   font-family: "DevinneSwash", fantasy;
+   color : #FFFFFF;
+   background-color : #000a1c;
+}
