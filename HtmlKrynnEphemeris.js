@@ -61,6 +61,9 @@ function HephemerisData()
    this.m_skychart_starfield_intensity = 2;
    this.m_skychart_grid_intensity = 3;
    this.m_moon_phases_decoration_intensity = 0;
+
+   this.m_sun_chart_enabled = true;
+   this.m_sky_chart_enabled = true;
 }
 
 HephemerisData.prototype.getMoonPhasesDecorationIntensity = function()
@@ -343,6 +346,9 @@ function get_map_context()
 
 function draw_map(p_data)
 {
+   // p_data.m_sky_chart_enabled = false;
+   // p_data.m_sun_chart_enabled = false;
+   
    const background_color = "#000a1c";
    
    const ctx = get_map_context();
@@ -352,23 +358,25 @@ function draw_map(p_data)
    ctx.fillRect(0, 0, 800, 800);
    
    // sky chart map
-   draw_sky_chart(p_data, p_data.getSunPhase(), p_data.c_sunPhasePeriod, 800, p_data.m_latitude);
+   if(p_data.m_sky_chart_enabled)
+   {
+      draw_sky_chart(p_data, p_data.getSunPhase(), p_data.c_sunPhasePeriod, 800, p_data.m_latitude);
 
-   // color background
-   ctx.fillStyle = background_color;
-   ctx.fillRect(0, 0, 800, 200);
-   ctx.fillRect(0, 600, 800, 200);
-   ctx.fillRect(0, 0, 200, 800);
-   ctx.fillRect(600, 0, 200, 800);
+      // color background
+      ctx.fillStyle = background_color;
+      ctx.fillRect(0, 0, 800, 200);
+      ctx.fillRect(0, 600, 800, 200);
+      ctx.fillRect(0, 0, 200, 800);
+      ctx.fillRect(600, 0, 200, 800);
 
+      // horizon map
+      const horizon_img = document.getElementById("ID_imageHorizon");
+      ctx.drawImage(horizon_img, 0, 0);
 
-   // compass map
-   const horizon_img = document.getElementById("ID_imageHorizon");
-   ctx.drawImage(horizon_img, 0, 0);
-
-   // compass map
-   const compass_img = document.getElementById("ID_imageCompass");
-   ctx.drawImage(compass_img, 0, 0);
+      // compass map
+      const compass_img = document.getElementById("ID_imageCompass");
+      ctx.drawImage(compass_img, 0, 0);
+   }
 
    // background map
    const map_src = (p_data.m_is_taladas) ? "ID_imageMapTaladas" : "ID_imageMapClassic";
@@ -384,7 +392,13 @@ function draw_map(p_data)
       ctx.drawImage(moon_phases_decoration_img, 0, 0);
    }
 
-   draw_sun(p_data.m_is_taladas, p_data.getSunPhase());
+   if(p_data.m_sun_chart_enabled)
+   {
+      const compass_img = document.getElementById("ID_imageSunPhases");
+      ctx.drawImage(compass_img, 0, 0);
+      draw_sun(p_data.m_is_taladas, p_data.getSunPhase());
+   }
+   
    draw_moon_solinari(p_data.m_is_taladas, p_data.getSolinariPhase());
    draw_moon_lunitari(p_data.m_is_taladas, p_data.getLunitariPhase());
    draw_moon_nuitari(p_data.m_is_taladas, p_data.getNuitariPhase());
