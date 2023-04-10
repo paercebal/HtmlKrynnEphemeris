@@ -390,7 +390,7 @@ function draw_map(p_data)
    draw_moon_nuitari(p_data.m_is_taladas, p_data.getNuitariPhase());
 }
 
-function get_calendar_date_as_string_by_origin(p_origin, p_year, p_month, p_day)
+function get_calendar_date_as_string_by_origin(p_origin, p_year, p_month, p_day, p_display_legacy)
 {
     function week_day_name(p_origin, p_day)
     {
@@ -423,7 +423,11 @@ function get_calendar_date_as_string_by_origin(p_origin, p_year, p_month, p_day)
     {
         const ac_pc_year = convert_calendar_year_to_dumb_year(p_year);
         const str_ac_prefix = (p_year >= 0) ? " AC" : " PC";
-        
+        return ac_pc_year + str_ac_prefix;
+    }
+    
+    function legacy_year_names(p_year)
+    {
         // Istar Calendar
         const str_ia_suffix = " [" + (p_year + 963) + " IA]";
 
@@ -433,13 +437,18 @@ function get_calendar_date_as_string_by_origin(p_origin, p_year, p_month, p_day)
         // Kender Calendar
         const str_ktol_suffix = " [" + (p_year + 3000) + " KToL]";
        
-        return ac_pc_year + str_ac_prefix + str_ia_suffix + str_ec_suffix + str_ktol_suffix;
+        return str_ia_suffix + str_ec_suffix + str_ktol_suffix;
     }
     
     let str_calendar_date = week_day_name(p_origin, p_day);
     str_calendar_date += " " + day_name(p_day);
     str_calendar_date += " " + month_name(p_origin, p_month);
     str_calendar_date += " " + year_name(p_year);
+    
+    if(p_display_legacy)
+    {
+       str_calendar_date += " " + legacy_year_names(p_year);
+    }
     
     return str_calendar_date;
 }
