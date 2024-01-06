@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
-<title>Krynn Ephemeris v0.9.96</title>
+<title>Krynn Ephemeris v0.9.98</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
 <script src="./HtmlKrynnEphemeris.calendars.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
@@ -12,7 +12,7 @@
 <body onload="do_onload()">
 
 <!--
-<h1>Krynn Ephemeris (v0.9.92)</h1>
+<h1>Krynn Ephemeris (v0.9.98)</h1>
 -->
 <!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
 
@@ -128,9 +128,9 @@ Nuitari: <input id="ID_phaseDay_Nuitari" type="text" size="2" value="0" readonly
 <br />
 
 <b>Phase Days at Day Zero:</b>
-Solinari: <input id="ID_phaseDayAtDayZero_Solinari" type="number" size="2" value="34" min="0" max="35" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
-Lunitari: <input id="ID_phaseDayAtDayZero_Lunitari" type="number" size="2" value="26" min="0" max="27" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
-Nuitari: <input id="ID_phaseDayAtDayZero_Nuitari" type="number" size="2" value="6" min="0" max="7" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
+Solinari: <input id="ID_phaseDayAtDayZero_Solinari" type="number" size="3" value="6" min="0" max="35" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
+Lunitari: <input id="ID_phaseDayAtDayZero_Lunitari" type="number" size="3" value="22" min="0" max="27" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
+Nuitari: <input id="ID_phaseDayAtDayZero_Nuitari" type="number" size="3" value="2" min="0" max="7" onchange="on_change_moon_phase_days_at_day_zero(true)" onkeyup="on_change_moon_phase_days_at_day_zero(true)" />
 
 </div>
 
@@ -542,7 +542,7 @@ function get_location_search_info(p_redraw_all)
 {
    let params = (new URL(document.location)).searchParams;
    
-   let taladas_or_classic = parseInt(params.get('taladas_or_classic'), 10);
+   let taladas_or_classic = params.get('taladas_or_classic');
    if(taladas_or_classic != null)
    {
       if(taladas_or_classic == 'taladas')
