@@ -34,9 +34,36 @@ function modulo(n, m)
 function HephemerisData()
 {
    //this.c_sunPhaseAtDayZero = 0;
-   this.c_solinariPhaseAtDayZero = 34; //13;
-   this.c_lunitariPhaseAtDayZero = 26; //21;
-   this.c_nuitariPhaseAtDayZero = 6; //1;
+   
+   //this.c_solinariPhaseAtDayZero = 34; //13;
+   //this.c_lunitariPhaseAtDayZero = 26; //21;
+   //this.c_nuitariPhaseAtDayZero = 6; //1;
+   
+   // Raistlin passed the Test in 346 AC
+   // (see: https://dragonlance.fandom.com/wiki/346_AC)
+   //
+   // THE SOULFORGE: BOOK 6, Chapter 1
+   //
+   // IT WAS THE SIXTH DAY OF THE SEVENTH MONTH.
+   // 
+   // [...]
+   //
+   // Above the Tower, silver Solinari and red Lunitari shone brightly.
+   // Nuitari was there as well, a dark hole in the constellations. The three
+   // moons were full this night, as was necessary for the Test.
+   //
+   // THE SOULFORGE: BOOK 6, Chapter 2
+   //
+   // On the seventh day of the seventh month, seven magi were ushered
+   // into a large courtyard at the base of the Tower of High Sorcery.
+   //
+   // CONCLUSION
+   //
+   // The 7th day of the 7th month of 346 AC was a Night of the Eye.
+   //
+   this.c_solinariPhaseAtDayZero = 6; //34; //13;
+   this.c_lunitariPhaseAtDayZero = 22; //26; //21;
+   this.c_nuitariPhaseAtDayZero = 2; //6; //1;
 
    this.m_solinariPhaseAtDayZero = this.c_solinariPhaseAtDayZero;
    this.m_lunitariPhaseAtDayZero = this.c_lunitariPhaseAtDayZero;
@@ -52,7 +79,7 @@ function HephemerisData()
    this.c_yearLength = 336;
    
    this.m_is_debug_visible = false;
-   this.m_is_taladas = true;
+   this.m_is_taladas = false;
    
    // 119842 : Tuesday 3rd September 357 AC [1319 IA] [2957 EC] [3356 KToL]
    this.m_epochDay = 119842;
