@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Style-Type" content="text/css" />
 <meta http-equiv="Content-Script-Type" content="text/javascript" />
-<title>Krynn Ephemeris v0.9.98</title>
+<title>Krynn Ephemeris v0.9.99</title>
 <script src="./HtmlKrynnEphemeris.js"></script>
 <script src="./HtmlKrynnEphemeris.calendars.js"></script>
 <style>@import url("HtmlKrynnEphemeris.css");</style>
@@ -12,7 +12,7 @@
 <body onload="do_onload()">
 
 <!--
-<h1>Krynn Ephemeris (v0.9.98)</h1>
+<h1>Krynn Ephemeris (v0.9.99)</h1>
 -->
 <!--<div>🌑🌒🌓🌔🌕🌖🌗🌘</div>-->
 
@@ -71,8 +71,8 @@ Latitude:<input id="ID_latitude" type="number" step="1" size="4" value="-45" onc
 </span>
 
 <span class="cssButtonGroup">
-<button id="ID_setTaladasOrClassic" type="button" onclick="set_taladas_or_classic()">Set Taladas</button>
-<button id="ID_enableDebugOrNot" type="button" onclick="enable_debug_or_not()">Enable Debug</button>
+<button id="ID_setTaladasOrClassic" type="button" onclick="set_taladas_or_classic()" title="Uses either the classic moon alignement chart, or the Taladas one">Set Taladas</button>
+<button id="ID_enableDebugOrNot" type="button" onclick="enable_debug_or_not()" title="Shows/hides debug information and fields">Enable Debug</button>
 </span>
 
 <!--

@@ -221,7 +221,9 @@ function deduce_canvas_sky_chart_coordinates(p_sun_phase, p_sun_phase_max, p_sky
    const sky_chart_image_half_size = p_sky_chart_image_size / 2;
 
    let sky_chart_phase = p_sun_phase / p_sun_phase_max;
-   let sky_chart_phase_radian = sky_chart_phase * 2 * Math.PI;
+   // multiplied by -1 so the two dragon constellations appear
+   // to turn around the book as time passes.
+   let sky_chart_phase_radian = -1 * sky_chart_phase * 2 * Math.PI;
    
    var str_alert = "";
    str_alert += "canvas_x_size: " + canvas_x_size + "\n";
