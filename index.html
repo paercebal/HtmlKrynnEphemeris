@@ -84,6 +84,8 @@ Latitude:<input id="ID_latitude" type="number" step="1" size="4" value="-45" onc
 
 <div>
 
+<span>
+
 Date:
 
 <select id="ID_calendarOrigin" onchange="on_change_calendar_origin_event()">
@@ -100,6 +102,20 @@ Date:
 
 <input id="ID_calendaryDateOrigin" type="text" size="60" value="" readonly="readonly" />
 
+</span>
+
+
+<span>
+Night of the Eye:
+
+<select id="ID_nightOfTheEyeMode" onchange="on_change_night_of_the_eye_event()">
+   <option value="Custom">Custom</option>
+   <option value="TheSoulforgeNovel">The Soulforge (Novel)</option>
+   <option value="AutumnTwilightRPG">Autumn Twilight (RPG)</option>
+   <option value="HourglassMageNovel">Dragons of the Hourglass Mage (Novel)</option>
+</select>
+
+</span>
 
 </div>
 
@@ -296,6 +312,22 @@ function on_change_calendar_origin_event()
    update_calendar_origin(true);
 }
 
+function on_change_night_of_the_eye_event()
+{
+   let s_value = getComboBoxValueById("ID_nightOfTheEyeMode", "Custom");
+   
+   let mpd = moons_phases_data.create_from_label(s_value);
+   
+   if(mpd != null)
+   {
+      g_global_data.m_solinariPhaseAtDayZero = mpd.m_solinari_day_zero;
+      g_global_data.m_lunitariPhaseAtDayZero = mpd.m_lunitari_day_zero;
+      g_global_data.m_nuitariPhaseAtDayZero = mpd.m_nuitari_day_zero;
+   }
+   
+   update_moons_phases_at_day_zero(true);
+}
+
 
 function update_calendarComboBox()
 {
@@ -334,6 +366,26 @@ function update_calendarComboBox()
       {
          o.innerHTML = text + " (" + o.value + ")";
       }
+   }
+}
+
+
+function update_moons_phases_at_day_zero(p_redraw_all)
+{
+   update_by_epoch_day();
+   update_phases_by_epoch_day();
+
+   setValueById("ID_phaseDayAtDayZero_Solinari", g_global_data.m_solinariPhaseAtDayZero);
+   setValueById("ID_phaseDayAtDayZero_Lunitari", g_global_data.m_lunitariPhaseAtDayZero);
+   setValueById("ID_phaseDayAtDayZero_Nuitari", g_global_data.m_nuitariPhaseAtDayZero);
+   
+   let mpd = new moons_phases_data(g_global_data.m_solinariPhaseAtDayZero, g_global_data.m_lunitariPhaseAtDayZero, g_global_data.m_nuitariPhaseAtDayZero);
+   
+   setComboBoxValueById("ID_nightOfTheEyeMode", mpd.m_night_of_the_eye, "Custom");
+   
+   if(p_redraw_all)
+   {
+      redraw_all();
    }
 }
 
@@ -415,13 +467,7 @@ function on_change_moon_phase_days_at_day_zero(p_redraw_all)
    g_global_data.m_lunitariPhaseAtDayZero = getIntegerById("ID_phaseDayAtDayZero_Lunitari");
    g_global_data.m_nuitariPhaseAtDayZero = getIntegerById("ID_phaseDayAtDayZero_Nuitari");
 
-   update_by_epoch_day();
-   update_phases_by_epoch_day();
-   
-   if(p_redraw_all)
-   {
-      redraw_all();
-   }
+   update_moons_phases_at_day_zero(p_redraw_all);
 }
 
 function on_change_calendar_date(p_redraw_all)
@@ -502,6 +548,7 @@ function set_taladas_or_classic(p_is_taladas)
 function redraw_all()
 {
    update_taladas_or_classic_button_label();
+   update_moons_phases_at_day_zero();
    draw_map(g_global_data);
    display_date_from_fields();
    update_debug_visibility();
@@ -613,24 +660,21 @@ function get_location_search_info(p_redraw_all)
    if((! isNaN(solinari_phase_day_zero)) && (solinari_phase_day_zero != g_global_data.m_solinariPhaseAtDayZero))
    {
       g_global_data.m_solinariPhaseAtDayZero = solinari_phase_day_zero;
-      setValueById("ID_phaseDayAtDayZero_Solinari", g_global_data.m_solinariPhaseAtDayZero);
-      on_change_moon_phase_days_at_day_zero(p_redraw_all);
+      update_moons_phases_at_day_zero(p_redraw_all);
    }
 
    let lunitari_phase_day_zero = parseInt(params.get('lunitari_phase_day_zero'), 10);
    if((! isNaN(lunitari_phase_day_zero)) && (lunitari_phase_day_zero != g_global_data.m_lunitariPhaseAtDayZero))
    {
       g_global_data.m_lunitariPhaseAtDayZero = lunitari_phase_day_zero;
-      setValueById("ID_phaseDayAtDayZero_Lunitari", g_global_data.m_lunitariPhaseAtDayZero);
-      on_change_moon_phase_days_at_day_zero(p_redraw_all);
+      update_moons_phases_at_day_zero(p_redraw_all);
    }
 
    let nuitari_phase_day_zero = parseInt(params.get('nuitari_phase_day_zero'), 10);
    if((! isNaN(nuitari_phase_day_zero)) && (nuitari_phase_day_zero != g_global_data.m_nuitariPhaseAtDayZero))
    {
       g_global_data.m_nuitariPhaseAtDayZero = nuitari_phase_day_zero;
-      setValueById("ID_phaseDayAtDayZero_Nuitari", g_global_data.m_nuitariPhaseAtDayZero);
-      on_change_moon_phase_days_at_day_zero(p_redraw_all);
+      update_moons_phases_at_day_zero(p_redraw_all);
    }
 
    let epoch = parseInt(params.get('epoch'), 10);
@@ -677,6 +721,7 @@ function set_location_search_info()
       s += '&moon_phases_intensity=' + g_global_data.m_moon_phases_decoration_intensity;
    }
 
+/*
    if(g_global_data.m_solinariPhaseAtDayZero != g_global_data.c_solinariPhaseAtDayZero)
    {
       s += '&solinari_phase_day_zero=' + g_global_data.m_solinariPhaseAtDayZero;
@@ -691,6 +736,11 @@ function set_location_search_info()
    {
       s += '&nuitari_phase_day_zero=' + g_global_data.m_nuitariPhaseAtDayZero;
    }
+*/
+
+   s += '&solinari_phase_day_zero=' + g_global_data.m_solinariPhaseAtDayZero;
+   s += '&lunitari_phase_day_zero=' + g_global_data.m_lunitariPhaseAtDayZero;
+   s += '&nuitari_phase_day_zero=' + g_global_data.m_nuitariPhaseAtDayZero;
 
    if(is_debug_visible())
    {

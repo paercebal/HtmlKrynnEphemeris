@@ -23,9 +23,164 @@ function setValueById(p_id, p_value)
     byId(p_id).value = p_value;
 }
 
+function setComboBoxValueById(p_id, p_value, p_value_default)
+{
+   const cb = byId(p_id);
+   let index_default = -1;
+   let index_found = -1;
+
+   for(let i = 0, iMax = cb.options.length; i < iMax; ++i)
+   {
+      const o = cb.options[i];
+      
+      if(o.value == p_value_default)
+      {
+         index_default = i;
+      }
+      
+      if(o.value == p_value)
+      {
+         index_found = i;
+         break;
+      }
+   }
+   
+   if(index_found != -1)
+   {
+      cb.selectedIndex = index_found;
+   }
+   else if(index_default != -1)
+   {
+      cb.selectedIndex = index_default;
+   }
+}
+
+function getComboBoxValueById(p_id, p_value_default)
+{
+   const cb = byId(p_id);
+   let index_default = -1;
+   let index_found = -1;
+   
+   if(cb.selectedIndex == -1)
+   {
+      return p_value_default;
+   }
+   else
+   {
+      return cb.options[cb.selectedIndex].value;
+   }
+}
+
 function modulo(n, m)
 {
   return ((n % m) + m) % m;
+}
+
+///////////////////////////////////////////////////////////////////
+//
+// Raistlin passed the Test in 346 AC
+// (see: https://dragonlance.fandom.com/wiki/346_AC)
+//
+// THE SOULFORGE: BOOK 6, Chapter 1
+//
+// IT WAS THE SIXTH DAY OF THE SEVENTH MONTH.
+// 
+// [...]
+//
+// Above the Tower, silver Solinari and red Lunitari shone brightly.
+// Nuitari was there as well, a dark hole in the constellations. The three
+// moons were full this night, as was necessary for the Test.
+//
+// THE SOULFORGE: BOOK 6, Chapter 2
+//
+// On the seventh day of the seventh month, seven magi were ushered
+// into a large courtyard at the base of the Tower of High Sorcery.
+//
+// CONCLUSION
+//
+// The 7th day of the 7th month of 346 AC was a Night of the Eye.
+//
+// Date: 346-07-07
+// DayZero: S6:L22:N2
+   
+///////////////////////////////////////////////////////////////////
+//
+// NIGHT OF THE EYE 2
+//
+// Autumn Twilight 15th : Night of the Eye. Dragonarmy force attack Northgate
+//
+// (Dragons of Autumn.pdf, p8)
+//
+// This is 351-10-15
+//
+// Date: 351-10-15
+// DayZero: S34:L14:N6
+
+///////////////////////////////////////////////////////////////////
+//
+// NIGHT OF THE EYE 3
+//
+// DRAGONS OF THE HOURGLASS MAGE: BOOK 3, Chapter 2
+//
+// “23rd Day, Month of Mishamont, Year 352 AC”
+// [...]
+// “Tomorrow night, the Night of the Eye, [...]”
+//
+// DRAGONS OF THE HOURGLASS MAGE: BOOK 3, Chapter 3
+//
+// “24th Day, Month of Mishamont, Year 352 AC”
+// [...]
+// “Tonight, the Night of the Eye.”
+//
+// Date: 352-03-24
+// DayZero: S29:L5:N1
+
+class moons_phases_data
+{
+   constructor(p_solinari_day_zero, p_lunitari_day_zero, p_nuitari_day_zero)
+   {
+      this.m_solinari_day_zero = p_solinari_day_zero;
+      this.m_lunitari_day_zero = p_lunitari_day_zero;
+      this.m_nuitari_day_zero = p_nuitari_day_zero;
+      this.m_night_of_the_eye = "Custom";
+      
+      if(   (this.m_solinari_day_zero == 6)     &&
+            (this.m_lunitari_day_zero == 22)    &&
+            (this.m_nuitari_day_zero == 2)      )
+      {
+         this.m_night_of_the_eye = "TheSoulforgeNovel";
+      }
+      else if( (this.m_solinari_day_zero == 34)    &&
+               (this.m_lunitari_day_zero == 14)    &&
+               (this.m_nuitari_day_zero == 6)      )
+      {
+         this.m_night_of_the_eye = "AutumnTwilightRPG";
+      }
+      else if( (this.m_solinari_day_zero == 29)    &&
+               (this.m_lunitari_day_zero == 5)     &&
+               (this.m_nuitari_day_zero == 1)      )
+      {
+         this.m_night_of_the_eye = "HourglassMageNovel";
+      }
+   }
+   
+   static create_from_label(p_label)
+   {
+      if(p_label == "TheSoulforgeNovel")
+      {
+         return new moons_phases_data(6, 22, 2);
+      }
+      else if(p_label == "AutumnTwilightRPG")
+      {
+         return new moons_phases_data(34, 14, 6);
+      }
+      else if(p_label == "HourglassMageNovel")
+      {
+         return new moons_phases_data(29, 5, 1);
+      }
+      
+      return null;
+   }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,28 +194,6 @@ function HephemerisData()
    //this.c_lunitariPhaseAtDayZero = 26; //21;
    //this.c_nuitariPhaseAtDayZero = 6; //1;
    
-   // Raistlin passed the Test in 346 AC
-   // (see: https://dragonlance.fandom.com/wiki/346_AC)
-   //
-   // THE SOULFORGE: BOOK 6, Chapter 1
-   //
-   // IT WAS THE SIXTH DAY OF THE SEVENTH MONTH.
-   // 
-   // [...]
-   //
-   // Above the Tower, silver Solinari and red Lunitari shone brightly.
-   // Nuitari was there as well, a dark hole in the constellations. The three
-   // moons were full this night, as was necessary for the Test.
-   //
-   // THE SOULFORGE: BOOK 6, Chapter 2
-   //
-   // On the seventh day of the seventh month, seven magi were ushered
-   // into a large courtyard at the base of the Tower of High Sorcery.
-   //
-   // CONCLUSION
-   //
-   // The 7th day of the 7th month of 346 AC was a Night of the Eye.
-   //
    this.c_solinariPhaseAtDayZero = 6; //34; //13;
    this.c_lunitariPhaseAtDayZero = 22; //26; //21;
    this.c_nuitariPhaseAtDayZero = 2; //6; //1;
