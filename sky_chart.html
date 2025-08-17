@@ -1,0 +1,158 @@
+<html>
+<head>
+<link rel="icon" type="image/png" href="./favicon.png" />
+<meta charset="utf-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<style>@import url("HtmlKrynnEphemeris.css");</style>
+<title>Krynn Sky Chart v0.1</title>
+</head>
+<body onload="do_onload()">
+
+<div id="ID_mapContainer">
+
+<div id="ID_mapMouseSensible"><canvas id="ID_canvas" width="800" height="800"></canvas></div>
+
+</div>
+
+<div id="ID_allControlsGroup">
+
+<div id="ID_userControls" class="cssDisplayBlock">
+
+<center>
+
+Starfield Intensity: <input id="ID_skychartStarfieldIntensity" type="number" step="1" size="3" value="2" min="0" max="10" onchange="on_change_skychart_starfield_intensity(true)" onkeyup="on_change_skychart_starfield_intensity(true)" />
+Grid Intensity: <input id="ID_skychartGridIntensity" type="number" step="1" size="3" value="3" min="0" max="10" onchange="on_change_skychart_grid_intensity(true)" onkeyup="on_change_skychart_grid_intensity(true)" />
+
+</center>
+
+</div>
+
+</div>
+
+
+<div style="display : none;">
+<img id="ID_imageMapClassic" src="./moon_phases.classic.png" /><br />
+<img id="ID_imageMapTaladas" src="./moon_phases.taladas.png" /><br />
+<img id="ID_imageSunPhases" src="./sun_phases.png" /><br />
+<img id="ID_imageSolinari" src="./moon.solinari.png" /><br />
+<img id="ID_imageLunitari" src="./moon.lunitari.png" /><br />
+<img id="ID_imageNuitari" src="./moon.nuitari.png" /><br />
+<img id="ID_imageSun" src="./sun.png" /><br />
+<img id="ID_imageSkyChart" src="./sky_chart.png" /><br />
+<img id="ID_imageSkyChartGrid" src="./sky_chart_grid.png" /><br />
+<img id="ID_imageSkyChartStarfield" src="./sky_chart_starfield.png" /><br />
+<img id="ID_imageCompass" src="./decoration.compass.png" /><br />
+<img id="ID_imageHorizon" src="./decoration.horizon.png" /><br />
+<img id="ID_imageMoonPhasesDecoration" src="./decoration.moon_phases.png" /><br />
+</div>
+
+<script>
+
+class SkyChartData
+{
+   constructor()
+   {
+      this.m_skychart_starfield_intensity = 2;
+      this.m_skychart_grid_intensity = 3;
+   }
+
+   getSkyChartStarfieldIntensity()
+   {
+      return this.m_skychart_starfield_intensity;
+   }
+
+   getSkyChartGridIntensity()
+   {
+      return this.m_skychart_grid_intensity;
+   }
+}
+
+let g_global_data = new SkyChartData();
+
+
+
+
+function byId(p_id)
+{
+   const o = document.getElementById(p_id);
+   if(o == null) alert("Id [" + p_id + "] not found");
+   return o;
+}
+
+function getIntegerById(p_id)
+{
+    return parseInt(byId(p_id).value, 10);
+}
+
+function on_change_skychart_starfield_intensity()
+{
+   g_global_data.m_skychart_starfield_intensity = getIntegerById("ID_skychartStarfieldIntensity");
+   redraw_all();
+}
+
+function on_change_skychart_grid_intensity(p_redraw_all)
+{
+   g_global_data.m_skychart_grid_intensity = getIntegerById("ID_skychartGridIntensity");
+   redraw_all();
+}
+
+function redraw_all()
+{
+   draw_map(g_global_data);
+}
+
+function get_map_context()
+{
+   const canvas = byId("ID_canvas");
+   const ctx = canvas.getContext("2d");
+   return ctx;
+}
+
+function draw_map(p_data)
+{
+   const background_color = "#000a1c";
+   
+   const ctx = get_map_context();
+
+   // color background
+   ctx.fillStyle = background_color;
+   ctx.fillRect(0, 0, 800, 800);
+
+   // color background
+   ctx.fillStyle = background_color;
+   ctx.fillRect(0, 0, 800, 200);
+   ctx.fillRect(0, 600, 800, 200);
+   ctx.fillRect(0, 0, 200, 800);
+   ctx.fillRect(600, 0, 200, 800);
+
+   // sky chart map
+   const sky_chart_img = document.getElementById("ID_imageSkyChart");
+   const sky_chart_grid_img = document.getElementById("ID_imageSkyChartGrid");
+   const sky_chart_starfield_img = document.getElementById("ID_imageSkyChartStarfield");
+
+   const sky_chart_starfield_intensity = p_data.getSkyChartStarfieldIntensity();
+   const sky_chart_grid_intensity = p_data.getSkyChartGridIntensity();
+
+   for(let i = 0; i < sky_chart_starfield_intensity; ++i)
+   {
+      ctx.drawImage(sky_chart_starfield_img, 0, 0);
+   }
+   
+   for(let i = 0; i < sky_chart_grid_intensity; ++i)
+   {
+      ctx.drawImage(sky_chart_grid_img, 0, 0);
+   }
+   
+   ctx.drawImage(sky_chart_img, 0, 0);
+}
+
+function do_onload()
+{
+   draw_map(g_global_data);
+}
+
+</script>
+
+</body>
+</html>
